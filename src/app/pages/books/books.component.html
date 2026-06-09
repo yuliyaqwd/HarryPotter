@@ -1,18 +1,18 @@
-<table>
+<table tuiTable [columns]="columns">
   <thead>
-    <tr>
-      <th>Title</th>
-      <th>Release date</th>
-      <th>Pages</th>
-      <th>Description</th>
+    <tr tuiThGroup>
+      <th *tuiHead="'title'" tuiTh>Title</th>
+      <th *tuiHead="'releaseDate'" tuiTh>Release date</th>
+      <th *tuiHead="'pages'" tuiTh>Pages</th>
+      <th *tuiHead="'description'" tuiTh>Description</th>
     </tr>
   </thead>
-  <tbody>
-    <tr *ngFor="let book of books">
-      <td>{{ book.title }}</td>
-      <td>{{ book.releaseDate }}</td>
-      <td>{{ book.pages }}</td>
-      <td>{{ book.description }}</td>
+  <tbody tuiTbody [data]="books">
+    <tr tuiTr *ngFor="let book of books">
+      <td *tuiCell="'title'" tuiTd>{{ book.title }}</td>
+      <td *tuiCell="'releaseDate'" tuiTd>{{ book.releaseDate }}</td>
+      <td *tuiCell="'pages'" tuiTd>{{ book.pages }}</td>
+      <td *tuiCell="'description'" tuiTd>{{ book.description }}</td>
     </tr>
   </tbody>
 </table>

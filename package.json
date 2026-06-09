@@ -18,6 +18,7 @@
     "@angular/platform-browser": "^19.2.0",
     "@angular/platform-browser-dynamic": "^19.2.0",
     "@angular/router": "^19.2.0",
+    "@taiga-ui/addon-table": "^4.86.0",
     "@taiga-ui/cdk": "^4.86.0",
     "@taiga-ui/core": "^4.86.0",
     "@taiga-ui/event-plugins": "^4.0.2",
