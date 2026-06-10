@@ -1,3 +1,10 @@
+<input
+  type="text"
+  [(ngModel)]="search"
+  (input)="onSearch()"
+  placeholder="Search by title"
+/>
+
 <table tuiTable [columns]="columns">
   <thead>
     <tr tuiThGroup>
@@ -7,8 +14,8 @@
       <th *tuiHead="'description'" tuiTh>Description</th>
     </tr>
   </thead>
-  <tbody tuiTbody [data]="books">
-    <tr tuiTr *ngFor="let book of books">
+  <tbody tuiTbody [data]="filteredBooks">
+    <tr tuiTr *ngFor="let book of filteredBooks">
       <td *tuiCell="'title'" tuiTd>{{ book.title }}</td>
       <td *tuiCell="'releaseDate'" tuiTd>{{ book.releaseDate }}</td>
       <td *tuiCell="'pages'" tuiTd>{{ book.pages }}</td>

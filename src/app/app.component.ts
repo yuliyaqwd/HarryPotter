@@ -1,13 +1,13 @@
-import { TuiRoot } from "@taiga-ui/core";
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { TuiRoot } from '@taiga-ui/core';
+import { HeaderComponent } from './layout/header/header.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, TuiRoot],
+  standalone: true,
+  imports: [RouterOutlet, TuiRoot, HeaderComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent {
-  title = 'harry-potter-app';
-}
+export class AppComponent {}
