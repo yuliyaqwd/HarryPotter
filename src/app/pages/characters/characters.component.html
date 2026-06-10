@@ -1,1 +1,18 @@
-<p>characters works!</p>
+<table tuiTable [columns]="columns">
+  <thead>
+    <tr tuiThGroup>
+      <th *tuiHead="'fullName'" tuiTh>Full name</th>
+      <th *tuiHead="'birthdate'" tuiTh>Birthdate</th>
+      <th *tuiHead="'hogwartsHouse'" tuiTh>House</th>
+      <th *tuiHead="'nickname'" tuiTh>Nickname</th>
+    </tr>
+  </thead>
+  <tbody tuiTbody [data]="characters">
+    <tr tuiTr *ngFor="let character of characters">
+      <td *tuiCell="'fullName'" tuiTd>{{ character.fullName }}</td>
+      <td *tuiCell="'birthdate'" tuiTd>{{ character.birthdate }}</td>
+      <td *tuiCell="'hogwartsHouse'" tuiTd>{{ character.hogwartsHouse }}</td>
+      <td *tuiCell="'nickname'" tuiTd>{{ character.nickname }}</td>
+    </tr>
+  </tbody>
+</table>
