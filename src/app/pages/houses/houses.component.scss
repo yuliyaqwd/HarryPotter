@@ -1,0 +1,44 @@
+.houses {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  padding: 24px;
+}
+
+.house-card__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.house-card__emoji {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #f0f4ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.house-card__founder {
+  color: #999;
+  font-size: 14px;
+}
+
+.house-card__colors {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #999;
+}
+
+.color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+}

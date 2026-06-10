@@ -1,1 +1,19 @@
-<p>houses works!</p>
+<div class="houses">
+  <div 
+    tuiCardLarge 
+    appearance="whiteblock"
+    *ngFor="let house of houses" 
+    [style.border]="'2px solid ' + house.colors[0]">
+    <div class="house-card__header">
+      <span class="house-card__emoji">{{ house.emoji }}</span>
+      <div>
+        <div class="house-card__name" [style.color]="house.colors[0]">{{ house.house }}</div>
+        <div class="house-card__founder">Founder: {{ house.founder }}</div>
+        <div class="house-card__colors">
+          colors:
+          <span class="color-dot" *ngFor="let color of house.colors" [style.background]="color"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
