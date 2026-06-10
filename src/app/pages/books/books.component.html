@@ -5,15 +5,14 @@
   placeholder="Search by title"
 />
 
-<table tuiTable [columns]="columns">
-  <thead>
+<table tuiTable [columns]="columns" [tuiSortBy]="currentSorter" (tuiSortByChange)="onSorterChange($event)" (directionChange)="onDirectionChange($event)">
     <tr tuiThGroup>
-      <th *tuiHead="'title'" tuiTh>Title</th>
-      <th *tuiHead="'releaseDate'" tuiTh>Release date</th>
-      <th *tuiHead="'pages'" tuiTh>Pages</th>
-      <th *tuiHead="'description'" tuiTh>Description</th>
+      <th *tuiHead="'title'" tuiTh [tuiSortable]="true">Title</th>
+      <th *tuiHead="'releaseDate'" tuiTh [tuiSortable]="true">Release date</th>
+      <th *tuiHead="'pages'" tuiTh [tuiSortable]="true">Pages</th>
+      <th *tuiHead="'description'" tuiTh [tuiSortable]="false">Description</th>
     </tr>
-  </thead>
+  <thead>
   <tbody tuiTbody [data]="filteredBooks">
     <tr tuiTr *ngFor="let book of filteredBooks">
       <td *tuiCell="'title'" tuiTd>{{ book.title }}</td>

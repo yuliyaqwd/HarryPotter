@@ -20,4 +20,9 @@ export class HousesComponent implements OnInit {
       this.houses = data;
     });
   }
+
+  getNameColor(colors: string[]): string {
+    const lightColors = ['yellow', 'gold', 'white', 'silver'];
+    return lightColors.includes(colors[0]) ? colors[1] : colors[0];
+  }
 }
