@@ -9,8 +9,15 @@
   </thead>
   <tbody tuiTbody [data]="characters">
     <tr tuiTr *ngFor="let character of characters">
-      <td *tuiCell="'fullName'" tuiTd>{{ character.fullName }}</td>
-      <td *tuiCell="'birthdate'" tuiTd>{{ character.birthdate }}</td>
+      <td *tuiCell="'fullName'" tuiTd>
+        <span class="name-cell">
+          {{ getCharacterData(character).fullName }}
+          <button tuiIconButton size="xs" appearance="ghost" class="info-btn" (click)="openView(character)">
+            <tui-icon icon="@tui.info" />
+          </button>
+        </span>
+      </td>
+      <td *tuiCell="'birthdate'" tuiTd>{{ getCharacterData(character).birthdate }}</td>
       <td *tuiCell="'hogwartsHouse'" tuiTd>
         <ng-template #houseHint>
           <div *ngIf="getHouse(character.hogwartsHouse) as house" class="house-hint" [style.border]="'2px solid ' + getNameColor(house.colors)">
@@ -27,7 +34,103 @@
         </ng-template>
         <span class="house-link" [tuiHint]="houseHint" tuiHintAppearance="dark">{{ character.hogwartsHouse }}</span>
       </td>
-      <td *tuiCell="'interpretedBy'" tuiTd>{{ character.interpretedBy }}</td>
+      <td *tuiCell="'interpretedBy'" tuiTd>{{ getCharacterData(character).interpretedBy }}</td>
     </tr>
   </tbody>
 </table>
+
+<!-- Character dialog (view + inline edit) -->
+<ng-template [(tuiDialog)]="isDialogOpen" [tuiDialogOptions]="dialogOptions">
+  <div class="char-dialog">
+    <img
+      class="char-dialog__photo"
+      [src]="selectedCharacter?.image"
+      [alt]="selectedCharacter?.fullName"
+    />
+    <div class="char-dialog__name-row">
+      <h2 class="char-dialog__name">{{ selectedCharacter?.fullName }}</h2>
+      <button *ngIf="dialogMode === 'view'" tuiIconButton size="m" appearance="ghost" (click)="switchToEdit()">
+        <tui-icon icon="@tui.user-round-pen" />
+      </button>
+      <button *ngIf="dialogMode === 'edit'" tuiIconButton size="m" appearance="ghost" (click)="saveEdit()">
+        <tui-icon icon="@tui.save" />
+      </button>
+    </div>
+
+    <div class="char-dialog__body">
+
+      <div class="char-dialog__row">
+        <span class="char-dialog__label">Nickname</span>
+        <strong>{{ selectedCharacter?.nickname || '—' }}</strong>
+      </div>
+
+      <div class="char-dialog__row">
+        <span class="char-dialog__label">House</span>
+        <strong>{{ selectedCharacter?.hogwartsHouse || '—' }}</strong>
+      </div>
+
+      <div class="char-dialog__row">
+        <span class="char-dialog__label">Interpreted by</span>
+        <strong *ngIf="dialogMode === 'view'">{{ selectedCharacter?.interpretedBy || '—' }}</strong>
+        <input
+          *ngIf="dialogMode === 'edit'"
+          class="char-edit__input"
+          name="interpretedBy"
+          type="text"
+          [(ngModel)]="editForm.interpretedBy"
+        />
+      </div>
+
+      <div class="char-dialog__row">
+        <span class="char-dialog__label">Birth date</span>
+        <strong *ngIf="dialogMode === 'view'">{{ selectedCharacter?.birthdate || '—' }}</strong>
+        <input
+          *ngIf="dialogMode === 'edit'"
+          class="char-edit__input char-edit__input--date"
+          name="birthdate"
+          type="date"
+          [(ngModel)]="editForm.birthdate"
+        />
+      </div>
+
+      <div class="char-dialog__row">
+        <span class="char-dialog__label">Children</span>
+        <span *ngIf="dialogMode === 'view'" class="char-dialog__children">
+          <ng-container *ngIf="selectedCharacter?.children?.length; else noChildren">
+            <strong *ngFor="let child of selectedCharacter?.children">{{ child }}</strong>
+          </ng-container>
+          <ng-template #noChildren><strong>—</strong></ng-template>
+        </span>
+        <input
+          *ngIf="dialogMode === 'edit'"
+          class="char-edit__input"
+          name="children"
+          type="text"
+          [(ngModel)]="editForm.children"
+        />
+      </div>
+
+      <div class="char-dialog__row char-dialog__row--spells">
+        <span class="char-dialog__label">Spells</span>
+        <strong *ngIf="dialogMode === 'view'">{{ (selectedCharacter?.spells || []).join(', ') || '—' }}</strong>
+
+        <!-- Custom multi-select dropdown -->
+        <div *ngIf="dialogMode === 'edit'" class="spell-select" [class.spell-select--open]="spellsDropdownOpen">
+          <button type="button" class="spell-select__trigger" (click)="spellsDropdownOpen = !spellsDropdownOpen">
+            <span class="spell-select__value">
+              {{ editForm.spells.length ? editForm.spells.join(', ') : 'Select spells…' }}
+            </span>
+            <tui-icon [icon]="spellsDropdownOpen ? '@tui.chevron-up' : '@tui.chevron-down'" class="spell-select__chevron" />
+          </button>
+          <div class="spell-select__dropdown" *ngIf="spellsDropdownOpen">
+            <label *ngFor="let spell of spells" class="spell-select__option">
+              <input type="checkbox" [checked]="isSpellSelected(spell)" (change)="toggleSpell(spell)" />
+              {{ spell }}
+            </label>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</ng-template>

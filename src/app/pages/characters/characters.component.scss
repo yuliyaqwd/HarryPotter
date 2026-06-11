@@ -1,3 +1,193 @@
+.name-cell {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.info-btn {
+  color: #5b8def !important;
+}
+
+// ─── Dialog ────────────────────────────────────────────────
+.char-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  &__photo {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 12px;
+  }
+
+  &__name-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 12px 0 4px;
+  }
+
+  &__name {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    color: #1b1f3b;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  &__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    min-height: 36px;
+  }
+
+  &__label {
+    color: #999;
+    flex-shrink: 0;
+  }
+
+  &__children {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+  }
+}
+
+// ─── Inline edit inputs ────────────────────────────────────
+.char-edit {
+  &__input {
+    flex: 1;
+    min-width: 0;
+    max-width: 200px;
+    padding: 7px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1b1f3b !important;
+    border: 1.5px solid #d0d5dd;
+    border-radius: 8px;
+    outline: none;
+    background: #fff !important;
+    font-family: inherit;
+    box-sizing: border-box;
+
+    &:focus {
+      border-color: #aab4c8;
+      box-shadow: 0 0 0 2px rgba(91, 141, 239, 0.12);
+    }
+
+    // Date input: show calendar icon in all states
+    &--date {
+      cursor: pointer;
+
+      &::-webkit-calendar-picker-indicator {
+        cursor: pointer;
+        opacity: 0.6;
+      }
+    }
+  }
+
+}
+
+// ─── Spells multi-select dropdown ──────────────────────────
+.char-dialog__row--spells {
+  align-items: flex-start;
+  padding-top: 4px;
+}
+
+.spell-select {
+  flex: 1;
+  max-width: 200px;
+  position: relative;
+
+  &__trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1b1f3b;
+    border: 1.5px solid #d0d5dd;
+    border-radius: 8px;
+    background: #fff;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+
+    &:focus {
+      outline: none;
+      border-color: #aab4c8;
+    }
+  }
+
+  &--open &__trigger {
+    border-color: #aab4c8;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  &__value {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__chevron {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    color: #999;
+  }
+
+  &__dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1.5px solid #aab4c8;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  &__option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #1b1f3b;
+    cursor: pointer;
+
+    &:hover {
+      background: #f5f7ff;
+    }
+
+    input[type='checkbox'] {
+      cursor: pointer;
+      accent-color: #5b8def;
+    }
+  }
+}
+
+// ─── House hint ────────────────────────────────────────────
 .house-link {
   cursor: pointer;
   text-decoration: underline;
@@ -27,6 +217,12 @@
   &__name {
     font-size: 14px;
     font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  &__founder {
+    color: #666;
+    font-size: 12px;
     margin-bottom: 2px;
   }
 

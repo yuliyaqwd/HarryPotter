@@ -1,5 +1,10 @@
 @use '@taiga-ui/core/styles/taiga-ui-local' as *;
 
+tui-dialog {
+  border: 3px solid var(--dialog-house-color, transparent) !important;
+  border-radius: var(--tui-radius-l) !important;
+}
+
 tui-hint:has(.house-hint) {
   padding: 0;
   background: transparent;
