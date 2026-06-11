@@ -11,7 +11,22 @@
     <tr tuiTr *ngFor="let character of characters">
       <td *tuiCell="'fullName'" tuiTd>{{ character.fullName }}</td>
       <td *tuiCell="'birthdate'" tuiTd>{{ character.birthdate }}</td>
-      <td *tuiCell="'hogwartsHouse'" tuiTd>{{ character.hogwartsHouse }}</td>
+      <td *tuiCell="'hogwartsHouse'" tuiTd>
+        <ng-template #houseHint>
+          <div *ngIf="getHouse(character.hogwartsHouse) as house" class="house-hint" [style.border]="'2px solid ' + getNameColor(house.colors)">
+            <span class="house-hint__emoji">{{ house.emoji }}</span>
+            <div>
+              <div class="house-hint__name" [style.color]="getNameColor(house.colors)">{{ house.house }}</div>
+              <div class="house-hint__founder">Founder: {{ house.founder }}</div>
+              <div class="house-hint__colors">
+                colors:
+                <span *ngFor="let color of house.colors" [style.background]="color" class="house-hint__dot"></span>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+        <span class="house-link" [tuiHint]="houseHint" tuiHintAppearance="dark">{{ character.hogwartsHouse }}</span>
+      </td>
       <td *tuiCell="'nickname'" tuiTd>{{ character.nickname }}</td>
     </tr>
   </tbody>

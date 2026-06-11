@@ -1,1 +1,11 @@
 @use '@taiga-ui/core/styles/taiga-ui-local' as *;
+
+tui-hint:has(.house-hint) {
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+
+  &::before {
+    display: none;
+  }
+}
