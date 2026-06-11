@@ -14,7 +14,7 @@ import { HarryPotterService } from '../../services/harry-potter.service';
 export class CharactersComponent implements OnInit {
   characters: any[] = [];
   houses: any[] = [];
-  columns = ['fullName', 'birthdate', 'hogwartsHouse', 'nickname'];
+  columns = ['fullName', 'birthdate', 'hogwartsHouse', 'interpretedBy'];
 
   constructor(private harryPotterService: HarryPotterService) {}
 

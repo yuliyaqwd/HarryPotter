@@ -4,7 +4,7 @@
       <th *tuiHead="'fullName'" tuiTh>Full name</th>
       <th *tuiHead="'birthdate'" tuiTh>Birthdate</th>
       <th *tuiHead="'hogwartsHouse'" tuiTh>House</th>
-      <th *tuiHead="'nickname'" tuiTh>Nickname</th>
+      <th *tuiHead="'interpretedBy'" tuiTh>Actor</th>
     </tr>
   </thead>
   <tbody tuiTbody [data]="characters">
@@ -27,7 +27,7 @@
         </ng-template>
         <span class="house-link" [tuiHint]="houseHint" tuiHintAppearance="dark">{{ character.hogwartsHouse }}</span>
       </td>
-      <td *tuiCell="'nickname'" tuiTd>{{ character.nickname }}</td>
+      <td *tuiCell="'interpretedBy'" tuiTd>{{ character.interpretedBy }}</td>
     </tr>
   </tbody>
 </table>
