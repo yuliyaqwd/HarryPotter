@@ -138,14 +138,23 @@ export class CharactersComponent implements OnInit {
     return Math.min(a, b);
   }
 
-  onSortChange(event: { sortComparator: ((a: any, b: any) => number) | null; sortDirection: 1 | -1 }) {
-    if (!event.sortComparator) {
+  onSortChange(event: { sortKey: string | null; sortDirection: 1 | -1 }) {
+    if (!event.sortKey) {
       this.loadPage();
       return;
     }
-    this.characters = [...this.characters].sort(
-      (a, b) => event.sortDirection * event.sortComparator!(a, b),
-    );
+    const key = event.sortKey;
+    const dir = event.sortDirection;
+    this.characters = [...this.characters].sort((a, b) => {
+      if (key === 'birthdate') {
+        const aDate = new Date(a[key] ?? '').getTime() || 0;
+        const bDate = new Date(b[key] ?? '').getTime() || 0;
+        return (aDate - bDate) * dir;
+      }
+      const aVal = String(a[key] ?? '');
+      const bVal = String(b[key] ?? '');
+      return aVal.localeCompare(bVal) * dir;
+    });
   }
 
   // ─── House helpers ──────────────────────────────────────────

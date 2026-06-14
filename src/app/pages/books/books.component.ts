@@ -86,13 +86,17 @@ export class BooksComponent implements OnInit {
     return Math.min(a, b);
   }
 
-  onSortChange(event: { sortComparator: ((a: any, b: any) => number) | null; sortDirection: 1 | -1 }) {
-    if (!event.sortComparator) {
+  onSortChange(event: { sortKey: string | null; sortDirection: 1 | -1 }) {
+    if (!event.sortKey) {
       this.loadPage();
       return;
     }
-    this.displayedBooks = [...this.displayedBooks].sort(
-      (a, b) => event.sortDirection * event.sortComparator!(a, b),
-    );
+    const key = event.sortKey;
+    const dir = event.sortDirection;
+    this.displayedBooks = [...this.displayedBooks].sort((a, b) => {
+      const aVal = String(a[key] ?? '');
+      const bVal = String(b[key] ?? '');
+      return aVal.localeCompare(bVal) * dir;
+    });
   }
 }

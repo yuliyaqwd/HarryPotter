@@ -8,13 +8,13 @@
   />
 </div>
 
-<table tuiTable [columns]="columns" (sortChange)="onSortChange($event)">
+<table tuiTable [columns]="columns" tuiSortBy (tuiSortChange)="onSortChange($event)">
   <thead>
     <tr tuiThGroup>
-      <th *tuiHead="'title'" tuiTh>{{ 'books.col.title' | translate }}</th>
-      <th *tuiHead="'releaseDate'" tuiTh>{{ 'books.col.releaseDate' | translate }}</th>
-      <th *tuiHead="'pages'" tuiTh>{{ 'books.col.pages' | translate }}</th>
-      <th *tuiHead="'description'" tuiTh>{{ 'books.col.description' | translate }}</th>
+      <th *tuiHead="'title'" tuiTh [tuiSortable]="true">{{ 'books.col.title' | translate }}</th>
+      <th *tuiHead="'releaseDate'" tuiTh [tuiSortable]="true">{{ 'books.col.releaseDate' | translate }}</th>
+      <th *tuiHead="'pages'" tuiTh [tuiSortable]="true">{{ 'books.col.pages' | translate }}</th>
+      <th *tuiHead="'description'" tuiTh [tuiSortable]="true">{{ 'books.col.description' | translate }}</th>
     </tr>
   </thead>
   <tbody tuiTbody [data]="displayedBooks">
