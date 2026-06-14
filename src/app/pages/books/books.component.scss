@@ -1,0 +1,62 @@
+table {
+  width: 100%;
+}
+
+.books-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.books-search {
+  flex: 1;
+  max-width: 320px;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1.5px solid #d0d5dd;
+  border-radius: 8px;
+  outline: none;
+  font-family: inherit;
+
+  &:focus {
+    border-color: #aab4c8;
+  }
+}
+
+.books-pagesize {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #666;
+  white-space: nowrap;
+
+  select {
+    padding: 6px 10px;
+    border: 1.5px solid #d0d5dd;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    cursor: pointer;
+    background: #fff;
+
+    &:focus {
+      border-color: #aab4c8;
+    }
+  }
+}
+
+.books-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding: 0 4px;
+}
+
+.books-total {
+  font-size: 13px;
+  color: #999;
+}

@@ -1,3 +1,13 @@
+<div class="chars-toolbar">
+  <input
+    class="chars-search"
+    type="text"
+    [(ngModel)]="search"
+    (input)="onSearch()"
+    placeholder="Search by name…"
+  />
+</div>
+
 <table tuiTable [columns]="columns">
   <thead>
     <tr tuiThGroup>
@@ -11,13 +21,13 @@
     <tr tuiTr *ngFor="let character of characters">
       <td *tuiCell="'fullName'" tuiTd>
         <span class="name-cell">
-          {{ getCharacterData(character).fullName }}
+          {{ character.fullName }}
           <button tuiIconButton size="xs" appearance="ghost" class="info-btn" (click)="openView(character)">
             <tui-icon icon="@tui.info" />
           </button>
         </span>
       </td>
-      <td *tuiCell="'birthdate'" tuiTd>{{ getCharacterData(character).birthdate }}</td>
+      <td *tuiCell="'birthdate'" tuiTd>{{ character.birthdate }}</td>
       <td *tuiCell="'hogwartsHouse'" tuiTd>
         <ng-template #houseHint>
           <div *ngIf="getHouse(character.hogwartsHouse) as house" class="house-hint" [style.border]="'2px solid ' + getNameColor(house.colors)">
@@ -34,10 +44,29 @@
         </ng-template>
         <span class="house-link" [tuiHint]="houseHint" tuiHintAppearance="dark">{{ character.hogwartsHouse }}</span>
       </td>
-      <td *tuiCell="'interpretedBy'" tuiTd>{{ getCharacterData(character).interpretedBy }}</td>
+      <td *tuiCell="'interpretedBy'" tuiTd>{{ character.interpretedBy }}</td>
     </tr>
   </tbody>
 </table>
+
+<div class="tbl-footer">
+  <span class="tbl-footer__pages">Страниц <strong>{{ totalPages }}</strong></span>
+
+  <div class="tbl-footer__center">
+    <span>строк на страницу</span>
+    <select class="tbl-footer__size" [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+      <option *ngFor="let s of pageSizes" [value]="s">{{ s }}</option>
+    </select>
+    <strong>{{ page * pageSize + 1 }}–{{ min((page + 1) * pageSize, totalItems) }}</strong>
+    <span>из</span>
+    <strong>{{ totalItems }}</strong>
+  </div>
+
+  <div class="tbl-footer__nav">
+    <button class="tbl-footer__btn" [disabled]="page === 0" (click)="onPageChange(page - 1)">&#8249;</button>
+    <button class="tbl-footer__btn" [disabled]="page >= totalPages - 1" (click)="onPageChange(page + 1)">&#8250;</button>
+  </div>
+</div>
 
 <!-- Character dialog (view + inline edit) -->
 <ng-template [(tuiDialog)]="isDialogOpen" [tuiDialogOptions]="dialogOptions">
@@ -52,7 +81,7 @@
       <button *ngIf="dialogMode === 'view'" tuiIconButton size="m" appearance="ghost" (click)="switchToEdit()">
         <tui-icon icon="@tui.user-round-pen" />
       </button>
-      <button *ngIf="dialogMode === 'edit'" tuiIconButton size="m" appearance="ghost" (click)="saveEdit()">
+      <button *ngIf="dialogMode === 'edit'" tuiIconButton size="m" appearance="ghost" (click)="trySaveEdit()">
         <tui-icon icon="@tui.save" />
       </button>
     </div>
@@ -81,16 +110,20 @@
         />
       </div>
 
-      <div class="char-dialog__row">
+      <div class="char-dialog__row char-dialog__row--col" [class.char-dialog__row--error]="birthdateError">
         <span class="char-dialog__label">Birth date</span>
         <strong *ngIf="dialogMode === 'view'">{{ selectedCharacter?.birthdate || '—' }}</strong>
-        <input
-          *ngIf="dialogMode === 'edit'"
-          class="char-edit__input char-edit__input--date"
-          name="birthdate"
-          type="date"
-          [(ngModel)]="editForm.birthdate"
-        />
+        <div *ngIf="dialogMode === 'edit'" class="char-edit__date-wrap">
+          <input
+            class="char-edit__input char-edit__input--date"
+            [class.char-edit__input--invalid]="birthdateError"
+            name="birthdate"
+            type="date"
+            [(ngModel)]="editForm.birthdate"
+            (change)="onBirthdateChange()"
+          />
+          <span *ngIf="birthdateError" class="char-edit__error">{{ birthdateError }}</span>
+        </div>
       </div>
 
       <div class="char-dialog__row">

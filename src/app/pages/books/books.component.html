@@ -1,20 +1,24 @@
-<input
-  type="text"
-  [(ngModel)]="search"
-  (input)="onSearch()"
-  placeholder="Search by title"
-/>
+<div class="books-toolbar">
+  <input
+    class="books-search"
+    type="text"
+    [(ngModel)]="search"
+    (input)="onSearch()"
+    placeholder="Search by title…"
+  />
+</div>
 
-<table tuiTable [columns]="columns" [tuiSortBy]="currentSorter" (tuiSortByChange)="onSorterChange($event)" (directionChange)="onDirectionChange($event)">
-    <tr tuiThGroup>
-      <th *tuiHead="'title'" tuiTh [tuiSortable]="true">Title</th>
-      <th *tuiHead="'releaseDate'" tuiTh [tuiSortable]="true">Release date</th>
-      <th *tuiHead="'pages'" tuiTh [tuiSortable]="true">Pages</th>
-      <th *tuiHead="'description'" tuiTh [tuiSortable]="false">Description</th>
-    </tr>
+<table tuiTable [columns]="columns">
   <thead>
-  <tbody tuiTbody [data]="filteredBooks">
-    <tr tuiTr *ngFor="let book of filteredBooks">
+    <tr tuiThGroup>
+      <th *tuiHead="'title'" tuiTh>Title</th>
+      <th *tuiHead="'releaseDate'" tuiTh>Release date</th>
+      <th *tuiHead="'pages'" tuiTh>Pages</th>
+      <th *tuiHead="'description'" tuiTh>Description</th>
+    </tr>
+  </thead>
+  <tbody tuiTbody [data]="displayedBooks">
+    <tr tuiTr *ngFor="let book of displayedBooks">
       <td *tuiCell="'title'" tuiTd>{{ book.title }}</td>
       <td *tuiCell="'releaseDate'" tuiTd>{{ book.releaseDate }}</td>
       <td *tuiCell="'pages'" tuiTd>{{ book.pages }}</td>
@@ -22,3 +26,22 @@
     </tr>
   </tbody>
 </table>
+
+<div class="tbl-footer">
+  <span class="tbl-footer__pages">Страниц <strong>{{ totalPages }}</strong></span>
+
+  <div class="tbl-footer__center">
+    <span>строк на страницу</span>
+    <select class="tbl-footer__size" [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)">
+      <option *ngFor="let s of pageSizes" [value]="s">{{ s }}</option>
+    </select>
+    <strong>{{ page * pageSize + 1 }}–{{ min((page + 1) * pageSize, totalItems) }}</strong>
+    <span>из</span>
+    <strong>{{ totalItems }}</strong>
+  </div>
+
+  <div class="tbl-footer__nav">
+    <button class="tbl-footer__btn" [disabled]="page === 0" (click)="onPageChange(page - 1)">&#8249;</button>
+    <button class="tbl-footer__btn" [disabled]="page >= totalPages - 1" (click)="onPageChange(page + 1)">&#8250;</button>
+  </div>
+</div>

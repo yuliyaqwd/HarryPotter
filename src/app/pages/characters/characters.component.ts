@@ -10,8 +10,8 @@ import { HarryPotterService } from '../../services/harry-potter.service';
 
 interface EditForm {
   interpretedBy: string;
-  birthdate: string; // stored as YYYY-MM-DD for <input type="date">
-  birthdateDisplay: string; // original string for display in view mode
+  birthdate: string;
+  birthdateDisplay: string;
   children: string;
   spells: string[];
 }
@@ -32,11 +32,26 @@ interface EditForm {
   styleUrl: './characters.component.scss',
 })
 export class CharactersComponent implements OnInit {
+  // All data for search + total count
+  allCharacters: any[] = [];
+
+  // Displayed page data (merged with localEdits)
   characters: any[] = [];
+
   houses: any[] = [];
   spells: string[] = [];
   columns = ['fullName', 'birthdate', 'hogwartsHouse', 'interpretedBy'];
 
+  // Pagination
+  page = 0;
+  pageSize = 5;
+  pageSizes = [5, 10, 20];
+  totalItems = 0;
+
+  // Search
+  search = '';
+
+  // Dialog
   selectedCharacter: any = null;
   isDialogOpen = false;
   dialogMode: 'view' | 'edit' = 'view';
@@ -51,6 +66,8 @@ export class CharactersComponent implements OnInit {
     spells: [],
   };
 
+  birthdateError = '';
+
   private localEdits = new Map<number, Partial<any>>();
 
   constructor(
@@ -59,8 +76,10 @@ export class CharactersComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.harryPotterService.getCharacters().subscribe((data) => {
-      this.characters = data;
+    this.harryPotterService.getAllCharacters().subscribe((data) => {
+      this.allCharacters = data;
+      this.totalItems = data.length;
+      this.loadPage();
     });
     this.harryPotterService.getHouses().subscribe((data) => {
       this.houses = data;
@@ -70,6 +89,52 @@ export class CharactersComponent implements OnInit {
     });
   }
 
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.totalItems / this.pageSize));
+  }
+
+  loadPage() {
+    if (this.search.trim()) {
+      const filtered = this.allCharacters.filter((c) =>
+        c.fullName.toLowerCase().includes(this.search.toLowerCase()),
+      );
+      this.totalItems = filtered.length;
+      const start = this.page * this.pageSize;
+      this.characters = filtered
+        .slice(start, start + this.pageSize)
+        .map((c) => this.getCharacterData(c));
+    } else {
+      this.totalItems = this.allCharacters.length;
+      this.harryPotterService
+        .getCharacters(this.page + 1, this.pageSize)
+        .subscribe((data) => {
+          this.characters = data.map((c) => this.getCharacterData(c));
+        });
+    }
+  }
+
+  onPageChange(page: number) {
+    this.page = page;
+    this.loadPage();
+  }
+
+  onPageSizeChange(size: number) {
+    this.pageSize = Number(size);
+    this.page = 0;
+    this.loadPage();
+  }
+
+  onSearch() {
+    this.page = 0;
+    this.loadPage();
+  }
+
+  min(a: number, b: number): number {
+    return Math.min(a, b);
+  }
+
+  // ─── House helpers ──────────────────────────────────────────
+
   getHouse(houseName: string) {
     return this.houses.find((h) => h.house === houseName);
   }
@@ -78,6 +143,8 @@ export class CharactersComponent implements OnInit {
     const lightColors = ['yellow', 'gold', 'white', 'silver'];
     return lightColors.includes(colors[0]) ? colors[1] : colors[0];
   }
+
+  // ─── Edit helpers ───────────────────────────────────────────
 
   getCharacterData(character: any): any {
     const edits = this.localEdits.get(character.index);
@@ -90,7 +157,6 @@ export class CharactersComponent implements OnInit {
     this.document.documentElement.style.setProperty('--dialog-house-color', color);
   }
 
-  /** Convert "Jul 31, 1980" → "1980-07-31" for <input type="date"> */
   private parseDateToISO(dateStr: string): string {
     if (!dateStr) return '';
     const d = new Date(dateStr);
@@ -101,7 +167,6 @@ export class CharactersComponent implements OnInit {
     return `${year}-${month}-${day}`;
   }
 
-  /** Convert "1980-07-31" back to "Jul 31, 1980" */
   private formatDateFromISO(iso: string): string {
     if (!iso) return '';
     const [year, month, day] = iso.split('-').map(Number);
@@ -109,11 +174,44 @@ export class CharactersComponent implements OnInit {
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
+  // ─── Dialog ─────────────────────────────────────────────────
+
   openView(character: any) {
     this.selectedCharacter = this.getCharacterData(character);
     this.setHouseColor(character);
     this.dialogMode = 'view';
     this.isDialogOpen = true;
+  }
+
+  validateBirthdate(): boolean {
+    const val = this.editForm.birthdate;
+    if (!val) {
+      this.birthdateError = 'Дата рождения обязательна';
+      return false;
+    }
+    const d = new Date(val);
+    if (isNaN(d.getTime())) {
+      this.birthdateError = 'Некорректная дата';
+      return false;
+    }
+    if (d > new Date()) {
+      this.birthdateError = 'Дата не может быть в будущем';
+      return false;
+    }
+    if (d.getFullYear() < 1800) {
+      this.birthdateError = 'Год не может быть раньше 1800';
+      return false;
+    }
+    this.birthdateError = '';
+    return true;
+  }
+
+  onBirthdateChange() {
+    if (this.editForm.birthdate) {
+      this.validateBirthdate();
+    } else {
+      this.birthdateError = '';
+    }
   }
 
   switchToEdit() {
@@ -125,6 +223,7 @@ export class CharactersComponent implements OnInit {
       children: (this.selectedCharacter.children || []).join(', '),
       spells: [...(this.selectedCharacter.spells || [])],
     };
+    this.birthdateError = '';
     this.dialogMode = 'edit';
   }
 
@@ -141,6 +240,11 @@ export class CharactersComponent implements OnInit {
     return this.editForm.spells.includes(spell);
   }
 
+  trySaveEdit() {
+    if (!this.validateBirthdate()) return;
+    this.saveEdit();
+  }
+
   saveEdit() {
     this.localEdits.set(this.selectedCharacter.index, {
       interpretedBy: this.editForm.interpretedBy,
@@ -154,6 +258,8 @@ export class CharactersComponent implements OnInit {
       spells: this.editForm.spells,
     });
     this.selectedCharacter = this.getCharacterData(this.selectedCharacter);
+    // Refresh displayed page so edits appear in the table
+    this.loadPage();
     this.dialogMode = 'view';
   }
 }
