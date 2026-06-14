@@ -8,7 +8,7 @@
   />
 </div>
 
-<table tuiTable [columns]="columns">
+<table tuiTable [columns]="columns" (sortChange)="onSortChange($event)">
   <thead>
     <tr tuiThGroup>
       <th *tuiHead="'title'" tuiTh>{{ 'books.col.title' | translate }}</th>

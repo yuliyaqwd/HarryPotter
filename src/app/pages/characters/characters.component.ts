@@ -54,6 +54,7 @@ export class CharactersComponent implements OnInit {
   // Search
   search = '';
 
+
   // Dialog
   selectedCharacter: any = null;
   isDialogOpen = false;
@@ -135,6 +136,16 @@ export class CharactersComponent implements OnInit {
 
   min(a: number, b: number): number {
     return Math.min(a, b);
+  }
+
+  onSortChange(event: { sortComparator: ((a: any, b: any) => number) | null; sortDirection: 1 | -1 }) {
+    if (!event.sortComparator) {
+      this.loadPage();
+      return;
+    }
+    this.characters = [...this.characters].sort(
+      (a, b) => event.sortDirection * event.sortComparator!(a, b),
+    );
   }
 
   // ─── House helpers ──────────────────────────────────────────

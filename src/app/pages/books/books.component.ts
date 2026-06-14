@@ -30,6 +30,7 @@ export class BooksComponent implements OnInit {
   // Search
   search = '';
 
+
   get totalPages(): number {
     return Math.max(1, Math.ceil(this.totalItems / this.pageSize));
   }
@@ -83,5 +84,15 @@ export class BooksComponent implements OnInit {
 
   min(a: number, b: number): number {
     return Math.min(a, b);
+  }
+
+  onSortChange(event: { sortComparator: ((a: any, b: any) => number) | null; sortDirection: 1 | -1 }) {
+    if (!event.sortComparator) {
+      this.loadPage();
+      return;
+    }
+    this.displayedBooks = [...this.displayedBooks].sort(
+      (a, b) => event.sortDirection * event.sortComparator!(a, b),
+    );
   }
 }
