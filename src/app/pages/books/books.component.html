@@ -4,17 +4,17 @@
     type="text"
     [(ngModel)]="search"
     (input)="onSearch()"
-    placeholder="Search by title…"
+    [placeholder]="'books.searchPlaceholder' | translate"
   />
 </div>
 
 <table tuiTable [columns]="columns">
   <thead>
     <tr tuiThGroup>
-      <th *tuiHead="'title'" tuiTh>Title</th>
-      <th *tuiHead="'releaseDate'" tuiTh>Release date</th>
-      <th *tuiHead="'pages'" tuiTh>Pages</th>
-      <th *tuiHead="'description'" tuiTh>Description</th>
+      <th *tuiHead="'title'" tuiTh>{{ 'books.col.title' | translate }}</th>
+      <th *tuiHead="'releaseDate'" tuiTh>{{ 'books.col.releaseDate' | translate }}</th>
+      <th *tuiHead="'pages'" tuiTh>{{ 'books.col.pages' | translate }}</th>
+      <th *tuiHead="'description'" tuiTh>{{ 'books.col.description' | translate }}</th>
     </tr>
   </thead>
   <tbody tuiTbody [data]="displayedBooks">
@@ -28,15 +28,15 @@
 </table>
 
 <div class="tbl-footer">
-  <span class="tbl-footer__pages">Страниц <strong>{{ totalPages }}</strong></span>
+  <span class="tbl-footer__pages">{{ 'pagination.pages' | translate }} <strong>{{ totalPages }}</strong></span>
 
   <div class="tbl-footer__center">
-    <span>строк на страницу</span>
+    <span>{{ 'pagination.rowsPerPage' | translate }}</span>
     <select class="tbl-footer__size" [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)">
       <option *ngFor="let s of pageSizes" [value]="s">{{ s }}</option>
     </select>
     <strong>{{ page * pageSize + 1 }}–{{ min((page + 1) * pageSize, totalItems) }}</strong>
-    <span>из</span>
+    <span>{{ 'pagination.of' | translate }}</span>
     <strong>{{ totalItems }}</strong>
   </div>
 

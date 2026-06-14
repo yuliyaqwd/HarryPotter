@@ -6,6 +6,8 @@ import { TuiHint } from '@taiga-ui/core/directives/hint';
 import { TuiDialog } from '@taiga-ui/core/components/dialog';
 import { TuiButton } from '@taiga-ui/core/components/button';
 import { TuiIcon } from '@taiga-ui/core/components/icon';
+import { TranslatePipe } from '../../pipes/translate.pipe';
+import { TranslationService } from '../../services/translation.service';
 import { HarryPotterService } from '../../services/harry-potter.service';
 
 interface EditForm {
@@ -27,6 +29,7 @@ interface EditForm {
     TuiDialog,
     TuiButton,
     TuiIcon,
+    TranslatePipe,
   ],
   templateUrl: './characters.component.html',
   styleUrl: './characters.component.scss',
@@ -72,6 +75,7 @@ export class CharactersComponent implements OnInit {
 
   constructor(
     private harryPotterService: HarryPotterService,
+    private translate: TranslationService,
     @Inject(DOCUMENT) private document: Document,
   ) {}
 
@@ -186,20 +190,20 @@ export class CharactersComponent implements OnInit {
   validateBirthdate(): boolean {
     const val = this.editForm.birthdate;
     if (!val) {
-      this.birthdateError = 'Дата рождения обязательна';
+      this.birthdateError = this.translate.instant('characters.validation.required');
       return false;
     }
     const d = new Date(val);
     if (isNaN(d.getTime())) {
-      this.birthdateError = 'Некорректная дата';
+      this.birthdateError = this.translate.instant('characters.validation.invalid');
       return false;
     }
     if (d > new Date()) {
-      this.birthdateError = 'Дата не может быть в будущем';
+      this.birthdateError = this.translate.instant('characters.validation.future');
       return false;
     }
     if (d.getFullYear() < 1800) {
-      this.birthdateError = 'Год не может быть раньше 1800';
+      this.birthdateError = this.translate.instant('characters.validation.minYear');
       return false;
     }
     this.birthdateError = '';

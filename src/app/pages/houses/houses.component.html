@@ -8,9 +8,9 @@
       <span class="house-card__emoji">{{ house.emoji }}</span>
       <div>
         <div class="house-card__name" [style.color]="getNameColor(house.colors)">{{ house.house }}</div>
-        <div class="house-card__founder">Founder: {{ house.founder }}</div>
+        <div class="house-card__founder">{{ 'houses.founder' | translate }}: {{ house.founder }}</div>
         <div class="house-card__colors">
-          colors
+          {{ 'houses.colors' | translate }}
           <span class="color-dot" *ngFor="let color of house.colors" [style.background]="color"></span>
         </div>
       </div>

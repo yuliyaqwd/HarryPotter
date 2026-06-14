@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TuiCardLarge } from '@taiga-ui/layout/components/card';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 import { HarryPotterService } from '../../services/harry-potter.service';
 
 @Component({
   selector: 'app-houses',
   standalone: true,
-  imports: [CommonModule, TuiCardLarge],
+  imports: [CommonModule, TuiCardLarge, TranslatePipe],
   templateUrl: './houses.component.html',
   styleUrl: './houses.component.scss'
 })

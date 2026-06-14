@@ -1,0 +1,49 @@
+{
+  "nav": {
+    "books": "Libri",
+    "houses": "Case",
+    "characters": "Personaggi"
+  },
+  "pagination": {
+    "pages": "Pagine",
+    "rowsPerPage": "righe per pagina",
+    "of": "di"
+  },
+  "books": {
+    "searchPlaceholder": "Cerca per titolo…",
+    "col": {
+      "title": "Titolo",
+      "releaseDate": "Data di uscita",
+      "pages": "Pagine",
+      "description": "Descrizione"
+    }
+  },
+  "characters": {
+    "searchPlaceholder": "Cerca per nome…",
+    "col": {
+      "fullName": "Nome completo",
+      "birthdate": "Data di nascita",
+      "house": "Casa",
+      "actor": "Attore"
+    },
+    "dialog": {
+      "nickname": "Soprannome",
+      "house": "Casa",
+      "interpretedBy": "Interpretato da",
+      "birthdate": "Data di nascita",
+      "children": "Figli",
+      "spells": "Incantesimi",
+      "selectSpells": "Seleziona incantesimi…"
+    },
+    "validation": {
+      "required": "La data di nascita è obbligatoria",
+      "invalid": "Data non valida",
+      "future": "La data non può essere nel futuro",
+      "minYear": "L'anno non può essere prima del 1800"
+    }
+  },
+  "houses": {
+    "founder": "Fondatore",
+    "colors": "colori"
+  }
+}

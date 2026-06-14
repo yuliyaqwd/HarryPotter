@@ -38,3 +38,33 @@ header {
     }
   }
 }
+
+.header__lang {
+  margin-left: auto;
+  display: flex;
+  gap: 4px;
+}
+
+.header__lang-btn {
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1.5px solid #d0d5dd;
+  border-radius: 6px;
+  background: transparent;
+  color: #666;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+
+  &:hover {
+    border-color: #aab4c8;
+    color: #333;
+  }
+
+  &--active {
+    background: #1b1f3b;
+    border-color: #1b1f3b;
+    color: #fff;
+  }
+}

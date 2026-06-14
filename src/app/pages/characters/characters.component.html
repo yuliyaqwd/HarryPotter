@@ -4,17 +4,17 @@
     type="text"
     [(ngModel)]="search"
     (input)="onSearch()"
-    placeholder="Search by name…"
+    [placeholder]="'characters.searchPlaceholder' | translate"
   />
 </div>
 
 <table tuiTable [columns]="columns">
   <thead>
     <tr tuiThGroup>
-      <th *tuiHead="'fullName'" tuiTh>Full name</th>
-      <th *tuiHead="'birthdate'" tuiTh>Birthdate</th>
-      <th *tuiHead="'hogwartsHouse'" tuiTh>House</th>
-      <th *tuiHead="'interpretedBy'" tuiTh>Actor</th>
+      <th *tuiHead="'fullName'" tuiTh>{{ 'characters.col.fullName' | translate }}</th>
+      <th *tuiHead="'birthdate'" tuiTh>{{ 'characters.col.birthdate' | translate }}</th>
+      <th *tuiHead="'hogwartsHouse'" tuiTh>{{ 'characters.col.house' | translate }}</th>
+      <th *tuiHead="'interpretedBy'" tuiTh>{{ 'characters.col.actor' | translate }}</th>
     </tr>
   </thead>
   <tbody tuiTbody [data]="characters">
@@ -34,9 +34,9 @@
             <span class="house-hint__emoji">{{ house.emoji }}</span>
             <div>
               <div class="house-hint__name" [style.color]="getNameColor(house.colors)">{{ house.house }}</div>
-              <div class="house-hint__founder">Founder: {{ house.founder }}</div>
+              <div class="house-hint__founder">{{ 'houses.founder' | translate }}: {{ house.founder }}</div>
               <div class="house-hint__colors">
-                colors:
+                {{ 'houses.colors' | translate }}:
                 <span *ngFor="let color of house.colors" [style.background]="color" class="house-hint__dot"></span>
               </div>
             </div>
@@ -50,15 +50,15 @@
 </table>
 
 <div class="tbl-footer">
-  <span class="tbl-footer__pages">Страниц <strong>{{ totalPages }}</strong></span>
+  <span class="tbl-footer__pages">{{ 'pagination.pages' | translate }} <strong>{{ totalPages }}</strong></span>
 
   <div class="tbl-footer__center">
-    <span>строк на страницу</span>
+    <span>{{ 'pagination.rowsPerPage' | translate }}</span>
     <select class="tbl-footer__size" [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)">
       <option *ngFor="let s of pageSizes" [value]="s">{{ s }}</option>
     </select>
     <strong>{{ page * pageSize + 1 }}–{{ min((page + 1) * pageSize, totalItems) }}</strong>
-    <span>из</span>
+    <span>{{ 'pagination.of' | translate }}</span>
     <strong>{{ totalItems }}</strong>
   </div>
 
@@ -89,17 +89,17 @@
     <div class="char-dialog__body">
 
       <div class="char-dialog__row">
-        <span class="char-dialog__label">Nickname</span>
+        <span class="char-dialog__label">{{ 'characters.dialog.nickname' | translate }}</span>
         <strong>{{ selectedCharacter?.nickname || '—' }}</strong>
       </div>
 
       <div class="char-dialog__row">
-        <span class="char-dialog__label">House</span>
+        <span class="char-dialog__label">{{ 'characters.dialog.house' | translate }}</span>
         <strong>{{ selectedCharacter?.hogwartsHouse || '—' }}</strong>
       </div>
 
       <div class="char-dialog__row">
-        <span class="char-dialog__label">Interpreted by</span>
+        <span class="char-dialog__label">{{ 'characters.dialog.interpretedBy' | translate }}</span>
         <strong *ngIf="dialogMode === 'view'">{{ selectedCharacter?.interpretedBy || '—' }}</strong>
         <input
           *ngIf="dialogMode === 'edit'"
@@ -111,7 +111,7 @@
       </div>
 
       <div class="char-dialog__row char-dialog__row--col" [class.char-dialog__row--error]="birthdateError">
-        <span class="char-dialog__label">Birth date</span>
+        <span class="char-dialog__label">{{ 'characters.dialog.birthdate' | translate }}</span>
         <strong *ngIf="dialogMode === 'view'">{{ selectedCharacter?.birthdate || '—' }}</strong>
         <div *ngIf="dialogMode === 'edit'" class="char-edit__date-wrap">
           <input
@@ -127,7 +127,7 @@
       </div>
 
       <div class="char-dialog__row">
-        <span class="char-dialog__label">Children</span>
+        <span class="char-dialog__label">{{ 'characters.dialog.children' | translate }}</span>
         <span *ngIf="dialogMode === 'view'" class="char-dialog__children">
           <ng-container *ngIf="selectedCharacter?.children?.length; else noChildren">
             <strong *ngFor="let child of selectedCharacter?.children">{{ child }}</strong>
@@ -144,14 +144,14 @@
       </div>
 
       <div class="char-dialog__row char-dialog__row--spells">
-        <span class="char-dialog__label">Spells</span>
+        <span class="char-dialog__label">{{ 'characters.dialog.spells' | translate }}</span>
         <strong *ngIf="dialogMode === 'view'">{{ (selectedCharacter?.spells || []).join(', ') || '—' }}</strong>
 
         <!-- Custom multi-select dropdown -->
         <div *ngIf="dialogMode === 'edit'" class="spell-select" [class.spell-select--open]="spellsDropdownOpen">
           <button type="button" class="spell-select__trigger" (click)="spellsDropdownOpen = !spellsDropdownOpen">
             <span class="spell-select__value">
-              {{ editForm.spells.length ? editForm.spells.join(', ') : 'Select spells…' }}
+              {{ editForm.spells.length ? editForm.spells.join(', ') : ('characters.dialog.selectSpells' | translate) }}
             </span>
             <tui-icon [icon]="spellsDropdownOpen ? '@tui.chevron-up' : '@tui.chevron-down'" class="spell-select__chevron" />
           </button>

@@ -4,8 +4,20 @@
     <span>Harry Potter</span>
   </div>
   <nav class="header__nav">
-    <a routerLink="/books" routerLinkActive="active">Books</a>
-    <a routerLink="/houses" routerLinkActive="active">Houses</a>
-    <a routerLink="/characters" routerLinkActive="active">Characters</a>
+    <a routerLink="/books" routerLinkActive="active">{{ 'nav.books' | translate }}</a>
+    <a routerLink="/houses" routerLinkActive="active">{{ 'nav.houses' | translate }}</a>
+    <a routerLink="/characters" routerLinkActive="active">{{ 'nav.characters' | translate }}</a>
   </nav>
+  <div class="header__lang">
+    <button
+      class="header__lang-btn"
+      [class.header__lang-btn--active]="currentLang === 'en'"
+      (click)="setLang('en')"
+    >EN</button>
+    <button
+      class="header__lang-btn"
+      [class.header__lang-btn--active]="currentLang === 'it'"
+      (click)="setLang('it')"
+    >IT</button>
+  </div>
 </header>

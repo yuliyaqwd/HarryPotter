@@ -2,12 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TuiTable } from '@taiga-ui/addon-table/components/table';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 import { HarryPotterService } from '../../services/harry-potter.service';
 
 @Component({
   selector: 'app-books',
   standalone: true,
-  imports: [CommonModule, FormsModule, TuiTable],
+  imports: [CommonModule, FormsModule, TuiTable, TranslatePipe],
   templateUrl: './books.component.html',
   styleUrl: './books.component.scss',
 })
