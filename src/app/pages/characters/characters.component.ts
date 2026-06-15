@@ -2,7 +2,15 @@ import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { skip } from 'rxjs/operators';
 import { CommonModule, DOCUMENT } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  AbstractControl,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { TuiTable } from '@taiga-ui/addon-table/components/table';
 import { TuiHint } from '@taiga-ui/core/directives/hint';
 import { TuiDialog } from '@taiga-ui/core/components/dialog';
@@ -12,12 +20,14 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
 import { HarryPotterService } from '../../services/harry-potter.service';
 
-interface EditForm {
-  interpretedBy: string;
-  birthdate: string;
-  birthdateDisplay: string;
-  children: string;
-  spells: string[];
+function notFutureDateValidator(control: AbstractControl): ValidationErrors | null {
+  if (!control.value) return null;
+  return new Date(control.value) > new Date() ? { futureDate: true } : null;
+}
+
+function minYear1800Validator(control: AbstractControl): ValidationErrors | null {
+  if (!control.value) return null;
+  return new Date(control.value).getFullYear() < 1800 ? { minYear: true } : null;
 }
 
 @Component({
@@ -26,6 +36,7 @@ interface EditForm {
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     TuiTable,
     TuiHint,
     TuiDialog,
@@ -38,6 +49,7 @@ interface EditForm {
 })
 export class CharactersComponent implements OnInit, OnDestroy {
   private langSub!: Subscription;
+
   // All data for search + total count
   allCharacters: any[] = [];
 
@@ -57,7 +69,6 @@ export class CharactersComponent implements OnInit, OnDestroy {
   // Search
   search = '';
 
-
   // Dialog
   selectedCharacter: any = null;
   isDialogOpen = false;
@@ -65,23 +76,23 @@ export class CharactersComponent implements OnInit, OnDestroy {
   dialogOptions: any = { label: '', size: 's', closeable: false };
   spellsDropdownOpen = false;
 
-  editForm: EditForm = {
-    interpretedBy: '',
-    birthdate: '',
-    birthdateDisplay: '',
-    children: '',
-    spells: [],
-  };
-
-  birthdateError = '';
+  editForm: FormGroup;
 
   private localEdits = new Map<number, Partial<any>>();
 
   constructor(
     private harryPotterService: HarryPotterService,
     private translate: TranslationService,
+    private fb: FormBuilder,
     @Inject(DOCUMENT) private document: Document,
-  ) {}
+  ) {
+    this.editForm = this.fb.group({
+      interpretedBy: [''],
+      birthdate: ['', [Validators.required, notFutureDateValidator, minYear1800Validator]],
+      children: [''],
+      spells: [[] as string[]],
+    });
+  }
 
   ngOnInit() {
     this.loadAll();
@@ -216,6 +227,21 @@ export class CharactersComponent implements OnInit, OnDestroy {
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
+  // ─── Reactive form getters ──────────────────────────────────
+
+  get birthdateErrors(): string {
+    const ctrl = this.editForm.get('birthdate');
+    if (!ctrl?.errors || !ctrl.touched) return '';
+    if (ctrl.errors['required']) return this.translate.instant('characters.validation.required');
+    if (ctrl.errors['futureDate']) return this.translate.instant('characters.validation.future');
+    if (ctrl.errors['minYear']) return this.translate.instant('characters.validation.minYear');
+    return '';
+  }
+
+  get selectedSpells(): string[] {
+    return this.editForm.get('spells')?.value ?? [];
+  }
+
   // ─── Dialog ─────────────────────────────────────────────────
 
   openView(character: any) {
@@ -225,79 +251,49 @@ export class CharactersComponent implements OnInit, OnDestroy {
     this.isDialogOpen = true;
   }
 
-  validateBirthdate(): boolean {
-    const val = this.editForm.birthdate;
-    if (!val) {
-      this.birthdateError = this.translate.instant('characters.validation.required');
-      return false;
-    }
-    const d = new Date(val);
-    if (isNaN(d.getTime())) {
-      this.birthdateError = this.translate.instant('characters.validation.invalid');
-      return false;
-    }
-    if (d > new Date()) {
-      this.birthdateError = this.translate.instant('characters.validation.future');
-      return false;
-    }
-    if (d.getFullYear() < 1800) {
-      this.birthdateError = this.translate.instant('characters.validation.minYear');
-      return false;
-    }
-    this.birthdateError = '';
-    return true;
-  }
-
-  onBirthdateChange() {
-    if (this.editForm.birthdate) {
-      this.validateBirthdate();
-    } else {
-      this.birthdateError = '';
-    }
-  }
-
   switchToEdit() {
     const isoDate = this.parseDateToISO(this.selectedCharacter.birthdate || '');
-    this.editForm = {
+    this.editForm.setValue({
       interpretedBy: this.selectedCharacter.interpretedBy || '',
       birthdate: isoDate,
-      birthdateDisplay: this.selectedCharacter.birthdate || '',
       children: (this.selectedCharacter.children || []).join(', '),
       spells: [...(this.selectedCharacter.spells || [])],
-    };
-    this.birthdateError = '';
+    });
+    this.editForm.markAsUntouched();
+    this.spellsDropdownOpen = false;
     this.dialogMode = 'edit';
   }
 
   toggleSpell(spell: string) {
-    const idx = this.editForm.spells.indexOf(spell);
-    if (idx === -1) {
-      this.editForm.spells = [...this.editForm.spells, spell];
-    } else {
-      this.editForm.spells = this.editForm.spells.filter((s) => s !== spell);
-    }
+    const current: string[] = this.editForm.get('spells')!.value;
+    const next = current.includes(spell)
+      ? current.filter((s) => s !== spell)
+      : [...current, spell];
+    this.editForm.get('spells')!.setValue(next);
   }
 
   isSpellSelected(spell: string): boolean {
-    return this.editForm.spells.includes(spell);
+    return (this.editForm.get('spells')?.value as string[]).includes(spell);
   }
 
   trySaveEdit() {
-    if (!this.validateBirthdate()) return;
+    this.editForm.markAllAsTouched();
+    if (this.editForm.invalid) return;
     this.saveEdit();
   }
 
   saveEdit() {
+    const { interpretedBy, birthdate, children, spells } = this.editForm.value;
     this.localEdits.set(this.selectedCharacter.index, {
-      interpretedBy: this.editForm.interpretedBy,
-      birthdate: this.editForm.birthdate
-        ? this.formatDateFromISO(this.editForm.birthdate)
-        : this.editForm.birthdateDisplay,
-      children: this.editForm.children
+      interpretedBy,
+      birthdate: birthdate
+        ? this.formatDateFromISO(birthdate)
+        : this.selectedCharacter.birthdate,
+      children: (children as string)
         .split(',')
-        .map((s) => s.trim())
+        .map((s: string) => s.trim())
         .filter(Boolean),
-      spells: this.editForm.spells,
+      spells,
     });
     this.selectedCharacter = this.getCharacterData(this.selectedCharacter);
     // Refresh displayed page so edits appear in the table

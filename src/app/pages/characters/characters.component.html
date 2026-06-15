@@ -86,7 +86,7 @@
       </button>
     </div>
 
-    <div class="char-dialog__body">
+    <div class="char-dialog__body" [formGroup]="editForm">
 
       <div class="char-dialog__row">
         <span class="char-dialog__label">{{ 'characters.dialog.nickname' | translate }}</span>
@@ -104,25 +104,22 @@
         <input
           *ngIf="dialogMode === 'edit'"
           class="char-edit__input"
-          name="interpretedBy"
           type="text"
-          [(ngModel)]="editForm.interpretedBy"
+          formControlName="interpretedBy"
         />
       </div>
 
-      <div class="char-dialog__row char-dialog__row--col" [class.char-dialog__row--error]="birthdateError">
+      <div class="char-dialog__row char-dialog__row--col" [class.char-dialog__row--error]="birthdateErrors">
         <span class="char-dialog__label">{{ 'characters.dialog.birthdate' | translate }}</span>
         <strong *ngIf="dialogMode === 'view'">{{ selectedCharacter?.birthdate || '—' }}</strong>
         <div *ngIf="dialogMode === 'edit'" class="char-edit__date-wrap">
           <input
             class="char-edit__input char-edit__input--date"
-            [class.char-edit__input--invalid]="birthdateError"
-            name="birthdate"
+            [class.char-edit__input--invalid]="birthdateErrors"
             type="date"
-            [(ngModel)]="editForm.birthdate"
-            (change)="onBirthdateChange()"
+            formControlName="birthdate"
           />
-          <span *ngIf="birthdateError" class="char-edit__error">{{ birthdateError }}</span>
+          <span *ngIf="birthdateErrors" class="char-edit__error">{{ birthdateErrors }}</span>
         </div>
       </div>
 
@@ -137,9 +134,8 @@
         <input
           *ngIf="dialogMode === 'edit'"
           class="char-edit__input"
-          name="children"
           type="text"
-          [(ngModel)]="editForm.children"
+          formControlName="children"
         />
       </div>
 
@@ -151,7 +147,7 @@
         <div *ngIf="dialogMode === 'edit'" class="spell-select" [class.spell-select--open]="spellsDropdownOpen">
           <button type="button" class="spell-select__trigger" (click)="spellsDropdownOpen = !spellsDropdownOpen">
             <span class="spell-select__value">
-              {{ editForm.spells.length ? editForm.spells.join(', ') : ('characters.dialog.selectSpells' | translate) }}
+              {{ selectedSpells.length ? selectedSpells.join(', ') : ('characters.dialog.selectSpells' | translate) }}
             </span>
             <tui-icon [icon]="spellsDropdownOpen ? '@tui.chevron-up' : '@tui.chevron-down'" class="spell-select__chevron" />
           </button>
