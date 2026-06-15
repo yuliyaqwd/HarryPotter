@@ -7,6 +7,7 @@ import { HarryPotterService } from '../../services/harry-potter.service';
 import { TranslationService } from '../../services/translation.service';
 import { Subscription } from 'rxjs';
 import { skip } from 'rxjs/operators';
+import { Book } from '../../models';
 
 @Component({
   selector: 'app-books',
@@ -19,21 +20,15 @@ export class BooksComponent implements OnInit, OnDestroy {
   private langSub!: Subscription;
   columns = ['title', 'releaseDate', 'pages', 'description'];
 
-  // All data (loaded once for search + total count)
-  allBooks: any[] = [];
+  allBooks: Book[] = [];
+  displayedBooks: Book[] = [];
 
-  // Currently displayed page
-  displayedBooks: any[] = [];
-
-  // Pagination
-  page = 0; // 0-based (TuiPagination uses 0-based index)
+  page = 0;
   pageSize = 5;
   pageSizes = [5, 10, 20];
   totalItems = 0;
 
-  // Search
   search = '';
-
 
   get totalPages(): number {
     return Math.max(1, Math.ceil(this.totalItems / this.pageSize));
@@ -67,7 +62,6 @@ export class BooksComponent implements OnInit, OnDestroy {
 
   loadPage() {
     if (this.search.trim()) {
-      // Client-side filtering + pagination slice
       const filtered = this.allBooks.filter((b) =>
         b.title.toLowerCase().includes(this.search.toLowerCase()),
       );
@@ -75,7 +69,6 @@ export class BooksComponent implements OnInit, OnDestroy {
       const start = this.page * this.pageSize;
       this.displayedBooks = filtered.slice(start, start + this.pageSize);
     } else {
-      // Server-side pagination
       this.totalItems = this.allBooks.length;
       this.harryPotterService
         .getBooks(this.page + 1, this.pageSize)
@@ -110,7 +103,7 @@ export class BooksComponent implements OnInit, OnDestroy {
       this.loadPage();
       return;
     }
-    const key = event.sortKey;
+    const key = event.sortKey as keyof Book;
     const dir = event.sortDirection;
     this.displayedBooks = [...this.displayedBooks].sort((a, b) => {
       const aVal = String(a[key] ?? '');

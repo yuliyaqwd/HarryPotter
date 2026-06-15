@@ -6,6 +6,7 @@ import { HarryPotterService } from '../../services/harry-potter.service';
 import { TranslationService } from '../../services/translation.service';
 import { Subscription } from 'rxjs';
 import { skip } from 'rxjs/operators';
+import { House } from '../../models';
 
 @Component({
   selector: 'app-houses',
@@ -15,7 +16,7 @@ import { skip } from 'rxjs/operators';
   styleUrl: './houses.component.scss'
 })
 export class HousesComponent implements OnInit, OnDestroy {
-  houses: any[] = [];
+  houses: House[] = [];
   private langSub!: Subscription;
 
   constructor(

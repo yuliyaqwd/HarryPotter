@@ -19,6 +19,7 @@ import { TuiIcon } from '@taiga-ui/core/components/icon';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
 import { HarryPotterService } from '../../services/harry-potter.service';
+import { Character, House, Spell } from '../../models';
 
 function notFutureDateValidator(control: AbstractControl): ValidationErrors | null {
   if (!control.value) return null;
@@ -50,14 +51,10 @@ function minYear1800Validator(control: AbstractControl): ValidationErrors | null
 export class CharactersComponent implements OnInit, OnDestroy {
   private langSub!: Subscription;
 
-  // All data for search + total count
-  allCharacters: any[] = [];
-
-  // Displayed page data (merged with localEdits)
-  characters: any[] = [];
-
-  houses: any[] = [];
-  spells: string[] = [];
+  allCharacters: Character[] = [];
+  characters: Character[] = [];
+  houses: House[] = [];
+  spellList: Spell[] = [];
   columns = ['fullName', 'birthdate', 'hogwartsHouse', 'interpretedBy'];
 
   // Pagination
@@ -70,15 +67,15 @@ export class CharactersComponent implements OnInit, OnDestroy {
   search = '';
 
   // Dialog
-  selectedCharacter: any = null;
+  selectedCharacter: Character | null = null;
   isDialogOpen = false;
   dialogMode: 'view' | 'edit' = 'view';
-  dialogOptions: any = { label: '', size: 's', closeable: false };
+  dialogOptions = { label: '', size: 's' as const, closeable: false };
   spellsDropdownOpen = false;
 
   editForm: FormGroup;
 
-  private localEdits = new Map<number, Partial<any>>();
+  private localEdits = new Map<number, Partial<Character>>();
 
   constructor(
     private harryPotterService: HarryPotterService,
@@ -118,9 +115,13 @@ export class CharactersComponent implements OnInit, OnDestroy {
     this.harryPotterService.getHouses().subscribe((data) => {
       this.houses = data;
     });
-    this.harryPotterService.getSpells().subscribe((data: any[]) => {
-      this.spells = data.map((s) => s.spell);
+    this.harryPotterService.getSpells().subscribe((data) => {
+      this.spellList = data;
     });
+  }
+
+  get spells(): string[] {
+    return this.spellList.map((s) => s.spell);
   }
 
   get totalPages(): number {
@@ -172,12 +173,12 @@ export class CharactersComponent implements OnInit, OnDestroy {
       this.loadPage();
       return;
     }
-    const key = event.sortKey;
+    const key = event.sortKey as keyof Character;
     const dir = event.sortDirection;
     this.characters = [...this.characters].sort((a, b) => {
       if (key === 'birthdate') {
-        const aDate = new Date(a[key] ?? '').getTime() || 0;
-        const bDate = new Date(b[key] ?? '').getTime() || 0;
+        const aDate = new Date(a.birthdate ?? '').getTime() || 0;
+        const bDate = new Date(b.birthdate ?? '').getTime() || 0;
         return (aDate - bDate) * dir;
       }
       const aVal = String(a[key] ?? '');
@@ -188,7 +189,7 @@ export class CharactersComponent implements OnInit, OnDestroy {
 
   // ─── House helpers ──────────────────────────────────────────
 
-  getHouse(houseName: string) {
+  getHouse(houseName: string): House | undefined {
     return this.houses.find((h) => h.house === houseName);
   }
 
@@ -199,12 +200,12 @@ export class CharactersComponent implements OnInit, OnDestroy {
 
   // ─── Edit helpers ───────────────────────────────────────────
 
-  getCharacterData(character: any): any {
+  getCharacterData(character: Character): Character {
     const edits = this.localEdits.get(character.index);
     return edits ? { ...character, ...edits } : character;
   }
 
-  private setHouseColor(character: any) {
+  private setHouseColor(character: Character) {
     const house = this.getHouse(character.hogwartsHouse);
     const color = house ? this.getNameColor(house.colors) : 'transparent';
     this.document.documentElement.style.setProperty('--dialog-house-color', color);
@@ -244,7 +245,7 @@ export class CharactersComponent implements OnInit, OnDestroy {
 
   // ─── Dialog ─────────────────────────────────────────────────
 
-  openView(character: any) {
+  openView(character: Character) {
     this.selectedCharacter = this.getCharacterData(character);
     this.setHouseColor(character);
     this.dialogMode = 'view';
@@ -252,6 +253,7 @@ export class CharactersComponent implements OnInit, OnDestroy {
   }
 
   switchToEdit() {
+    if (!this.selectedCharacter) return;
     const isoDate = this.parseDateToISO(this.selectedCharacter.birthdate || '');
     this.editForm.setValue({
       interpretedBy: this.selectedCharacter.interpretedBy || '',
@@ -283,20 +285,25 @@ export class CharactersComponent implements OnInit, OnDestroy {
   }
 
   saveEdit() {
-    const { interpretedBy, birthdate, children, spells } = this.editForm.value;
+    if (!this.selectedCharacter) return;
+    const { interpretedBy, birthdate, children, spells } = this.editForm.value as {
+      interpretedBy: string;
+      birthdate: string;
+      children: string;
+      spells: string[];
+    };
     this.localEdits.set(this.selectedCharacter.index, {
       interpretedBy,
       birthdate: birthdate
         ? this.formatDateFromISO(birthdate)
         : this.selectedCharacter.birthdate,
-      children: (children as string)
+      children: children
         .split(',')
-        .map((s: string) => s.trim())
+        .map((s) => s.trim())
         .filter(Boolean),
       spells,
     });
     this.selectedCharacter = this.getCharacterData(this.selectedCharacter);
-    // Refresh displayed page so edits appear in the table
     this.loadPage();
     this.dialogMode = 'view';
   }
