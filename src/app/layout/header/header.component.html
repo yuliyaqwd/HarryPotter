@@ -9,15 +9,27 @@
     <a routerLink="/characters" routerLinkActive="active">{{ 'nav.characters' | translate }}</a>
   </nav>
   <div class="header__lang">
-    <button
-      class="header__lang-btn"
-      [class.header__lang-btn--active]="currentLang === 'en'"
-      (click)="setLang('en')"
-    >EN</button>
-    <button
-      class="header__lang-btn"
-      [class.header__lang-btn--active]="currentLang === 'it'"
-      (click)="setLang('it')"
-    >IT</button>
+    <label class="header__lang-option">
+      <input
+        type="radio"
+        tuiRadio
+        name="lang"
+        value="en"
+        [(ngModel)]="currentLang"
+        (ngModelChange)="onLangChange($event)"
+      />
+      EN
+    </label>
+    <label class="header__lang-option">
+      <input
+        type="radio"
+        tuiRadio
+        name="lang"
+        value="it"
+        [(ngModel)]="currentLang"
+        (ngModelChange)="onLangChange($event)"
+      />
+      IT
+    </label>
   </div>
 </header>

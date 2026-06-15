@@ -1,8 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TuiCardLarge } from '@taiga-ui/layout/components/card';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { HarryPotterService } from '../../services/harry-potter.service';
+import { TranslationService } from '../../services/translation.service';
+import { Subscription } from 'rxjs';
+import { skip } from 'rxjs/operators';
 
 @Component({
   selector: 'app-houses',
@@ -11,12 +14,27 @@ import { HarryPotterService } from '../../services/harry-potter.service';
   templateUrl: './houses.component.html',
   styleUrl: './houses.component.scss'
 })
-export class HousesComponent implements OnInit {
+export class HousesComponent implements OnInit, OnDestroy {
   houses: any[] = [];
+  private langSub!: Subscription;
 
-  constructor(private harryPotterService: HarryPotterService) {}
+  constructor(
+    private harryPotterService: HarryPotterService,
+    private translation: TranslationService,
+  ) {}
 
   ngOnInit() {
+    this.loadAll();
+    this.langSub = this.translation.currentLang$.pipe(skip(1)).subscribe(() => {
+      this.loadAll();
+    });
+  }
+
+  ngOnDestroy() {
+    this.langSub.unsubscribe();
+  }
+
+  private loadAll() {
     this.harryPotterService.getHouses().subscribe(data => {
       this.houses = data;
     });

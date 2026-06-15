@@ -1,13 +1,19 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { TranslationService } from './translation.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HarryPotterService {
-  private baseUrl = 'https://potterapi-fedeperin.vercel.app/en';
+  private get baseUrl(): string {
+    return `https://potterapi-fedeperin.vercel.app/${this.translation.currentLang}`;
+  }
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private translation: TranslationService,
+  ) {}
 
   getBooks(page: number = 1, max: number = 10) {
     return this.http.get<any[]>(`${this.baseUrl}/books?max=${max}&page=${page}`);

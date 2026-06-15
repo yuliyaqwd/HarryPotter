@@ -1,4 +1,6 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { skip } from 'rxjs/operators';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TuiTable } from '@taiga-ui/addon-table/components/table';
@@ -34,7 +36,8 @@ interface EditForm {
   templateUrl: './characters.component.html',
   styleUrl: './characters.component.scss',
 })
-export class CharactersComponent implements OnInit {
+export class CharactersComponent implements OnInit, OnDestroy {
+  private langSub!: Subscription;
   // All data for search + total count
   allCharacters: any[] = [];
 
@@ -81,6 +84,21 @@ export class CharactersComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.loadAll();
+    this.langSub = this.translate.currentLang$.pipe(skip(1)).subscribe(() => {
+      this.page = 0;
+      this.search = '';
+      this.isDialogOpen = false;
+      this.localEdits.clear();
+      this.loadAll();
+    });
+  }
+
+  ngOnDestroy() {
+    this.langSub.unsubscribe();
+  }
+
+  private loadAll() {
     this.harryPotterService.getAllCharacters().subscribe((data) => {
       this.allCharacters = data;
       this.totalItems = data.length;

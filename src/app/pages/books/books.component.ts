@@ -1,9 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TuiTable } from '@taiga-ui/addon-table/components/table';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { HarryPotterService } from '../../services/harry-potter.service';
+import { TranslationService } from '../../services/translation.service';
+import { Subscription } from 'rxjs';
+import { skip } from 'rxjs/operators';
 
 @Component({
   selector: 'app-books',
@@ -12,7 +15,8 @@ import { HarryPotterService } from '../../services/harry-potter.service';
   templateUrl: './books.component.html',
   styleUrl: './books.component.scss',
 })
-export class BooksComponent implements OnInit {
+export class BooksComponent implements OnInit, OnDestroy {
+  private langSub!: Subscription;
   columns = ['title', 'releaseDate', 'pages', 'description'];
 
   // All data (loaded once for search + total count)
@@ -35,10 +39,25 @@ export class BooksComponent implements OnInit {
     return Math.max(1, Math.ceil(this.totalItems / this.pageSize));
   }
 
-  constructor(private harryPotterService: HarryPotterService) {}
+  constructor(
+    private harryPotterService: HarryPotterService,
+    private translation: TranslationService,
+  ) {}
 
   ngOnInit() {
-    // Load all data once to know total count and enable search
+    this.loadAll();
+    this.langSub = this.translation.currentLang$.pipe(skip(1)).subscribe(() => {
+      this.page = 0;
+      this.search = '';
+      this.loadAll();
+    });
+  }
+
+  ngOnDestroy() {
+    this.langSub.unsubscribe();
+  }
+
+  private loadAll() {
     this.harryPotterService.getAllBooks().subscribe((data) => {
       this.allBooks = data;
       this.totalItems = data.length;
