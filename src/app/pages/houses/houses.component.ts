@@ -1,5 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { TuiCardLarge } from '@taiga-ui/layout/components/card';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { HarryPotterService } from '../../services/harry-potter.service';
@@ -11,18 +10,16 @@ import { House } from '../../models';
 @Component({
   selector: 'app-houses',
   standalone: true,
-  imports: [CommonModule, TuiCardLarge, TranslatePipe],
+  imports: [TuiCardLarge, TranslatePipe],
   templateUrl: './houses.component.html',
-  styleUrl: './houses.component.scss'
+  styleUrl: './houses.component.scss',
 })
 export class HousesComponent implements OnInit, OnDestroy {
-  houses: House[] = [];
+  private harryPotterService = inject(HarryPotterService);
+  private translation = inject(TranslationService);
   private langSub!: Subscription;
 
-  constructor(
-    private harryPotterService: HarryPotterService,
-    private translation: TranslationService,
-  ) {}
+  houses: House[] = [];
 
   ngOnInit() {
     this.loadAll();
@@ -36,7 +33,7 @@ export class HousesComponent implements OnInit, OnDestroy {
   }
 
   private loadAll() {
-    this.harryPotterService.getHouses().subscribe(data => {
+    this.harryPotterService.getHouses().subscribe((data) => {
       this.houses = data;
     });
   }

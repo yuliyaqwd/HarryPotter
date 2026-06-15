@@ -1,19 +1,22 @@
 <div class="houses">
-  <div
-    tuiCardLarge
-    appearance="whiteblock"
-    *ngFor="let house of houses"
-    [style.border]="'2px solid ' + house.colors[0]">
-    <div class="house-card__header">
-      <span class="house-card__emoji">{{ house.emoji }}</span>
-      <div>
-        <div class="house-card__name" [style.color]="getNameColor(house.colors)">{{ house.house }}</div>
-        <div class="house-card__founder">{{ 'houses.founder' | translate }}: {{ house.founder }}</div>
-        <div class="house-card__colors">
-          {{ 'houses.colors' | translate }}
-          <span class="color-dot" *ngFor="let color of house.colors" [style.background]="color"></span>
+  @for (house of houses; track house.index) {
+    <div
+      tuiCardLarge
+      appearance="whiteblock"
+      [style.border]="'2px solid ' + house.colors[0]">
+      <div class="house-card__header">
+        <span class="house-card__emoji">{{ house.emoji }}</span>
+        <div>
+          <div class="house-card__name" [style.color]="getNameColor(house.colors)">{{ house.house }}</div>
+          <div class="house-card__founder">{{ 'houses.founder' | translate }}: {{ house.founder }}</div>
+          <div class="house-card__colors">
+            {{ 'houses.colors' | translate }}
+            @for (color of house.colors; track color) {
+              <span class="color-dot" [style.background]="color"></span>
+            }
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  }
 </div>

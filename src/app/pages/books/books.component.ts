@@ -1,5 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TuiTable } from '@taiga-ui/addon-table/components/table';
 import { TranslatePipe } from '../../pipes/translate.pipe';
@@ -12,32 +11,27 @@ import { Book } from '../../models';
 @Component({
   selector: 'app-books',
   standalone: true,
-  imports: [CommonModule, FormsModule, TuiTable, TranslatePipe],
+  imports: [FormsModule, TuiTable, TranslatePipe],
   templateUrl: './books.component.html',
   styleUrl: './books.component.scss',
 })
 export class BooksComponent implements OnInit, OnDestroy {
+  private harryPotterService = inject(HarryPotterService);
+  private translation = inject(TranslationService);
   private langSub!: Subscription;
-  columns = ['title', 'releaseDate', 'pages', 'description'];
 
+  columns = ['title', 'releaseDate', 'pages', 'description'];
   allBooks: Book[] = [];
   displayedBooks: Book[] = [];
-
   page = 0;
   pageSize = 5;
   pageSizes = [5, 10, 20];
   totalItems = 0;
-
   search = '';
 
   get totalPages(): number {
     return Math.max(1, Math.ceil(this.totalItems / this.pageSize));
   }
-
-  constructor(
-    private harryPotterService: HarryPotterService,
-    private translation: TranslationService,
-  ) {}
 
   ngOnInit() {
     this.loadAll();
@@ -99,16 +93,11 @@ export class BooksComponent implements OnInit, OnDestroy {
   }
 
   onSortChange(event: { sortKey: string | null; sortDirection: 1 | -1 }) {
-    if (!event.sortKey) {
-      this.loadPage();
-      return;
-    }
+    if (!event.sortKey) { this.loadPage(); return; }
     const key = event.sortKey as keyof Book;
     const dir = event.sortDirection;
-    this.displayedBooks = [...this.displayedBooks].sort((a, b) => {
-      const aVal = String(a[key] ?? '');
-      const bVal = String(b[key] ?? '');
-      return aVal.localeCompare(bVal) * dir;
-    });
+    this.displayedBooks = [...this.displayedBooks].sort((a, b) =>
+      String(a[key] ?? '').localeCompare(String(b[key] ?? '')) * dir,
+    );
   }
 }

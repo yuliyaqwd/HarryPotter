@@ -1,7 +1,7 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { skip } from 'rxjs/operators';
-import { CommonModule, DOCUMENT } from '@angular/common';
 import {
   FormsModule,
   ReactiveFormsModule,
@@ -35,7 +35,6 @@ function minYear1800Validator(control: AbstractControl): ValidationErrors | null
   selector: 'app-characters',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     ReactiveFormsModule,
     TuiTable,
@@ -49,6 +48,10 @@ function minYear1800Validator(control: AbstractControl): ValidationErrors | null
   styleUrl: './characters.component.scss',
 })
 export class CharactersComponent implements OnInit, OnDestroy {
+  private harryPotterService = inject(HarryPotterService);
+  private translate = inject(TranslationService);
+  private fb = inject(FormBuilder);
+  private document = inject(DOCUMENT);
   private langSub!: Subscription;
 
   allCharacters: Character[] = [];
@@ -57,39 +60,26 @@ export class CharactersComponent implements OnInit, OnDestroy {
   spellList: Spell[] = [];
   columns = ['fullName', 'birthdate', 'hogwartsHouse', 'interpretedBy'];
 
-  // Pagination
   page = 0;
   pageSize = 5;
   pageSizes = [5, 10, 20];
   totalItems = 0;
-
-  // Search
   search = '';
 
-  // Dialog
   selectedCharacter: Character | null = null;
   isDialogOpen = false;
   dialogMode: 'view' | 'edit' = 'view';
   dialogOptions = { label: '', size: 's' as const, closeable: false };
   spellsDropdownOpen = false;
 
-  editForm: FormGroup;
+  editForm: FormGroup = this.fb.group({
+    interpretedBy: [''],
+    birthdate: ['', [Validators.required, notFutureDateValidator, minYear1800Validator]],
+    children: [''],
+    spells: [[] as string[]],
+  });
 
   private localEdits = new Map<number, Partial<Character>>();
-
-  constructor(
-    private harryPotterService: HarryPotterService,
-    private translate: TranslationService,
-    private fb: FormBuilder,
-    @Inject(DOCUMENT) private document: Document,
-  ) {
-    this.editForm = this.fb.group({
-      interpretedBy: [''],
-      birthdate: ['', [Validators.required, notFutureDateValidator, minYear1800Validator]],
-      children: [''],
-      spells: [[] as string[]],
-    });
-  }
 
   ngOnInit() {
     this.loadAll();
@@ -169,10 +159,7 @@ export class CharactersComponent implements OnInit, OnDestroy {
   }
 
   onSortChange(event: { sortKey: string | null; sortDirection: 1 | -1 }) {
-    if (!event.sortKey) {
-      this.loadPage();
-      return;
-    }
+    if (!event.sortKey) { this.loadPage(); return; }
     const key = event.sortKey as keyof Character;
     const dir = event.sortDirection;
     this.characters = [...this.characters].sort((a, b) => {
@@ -181,9 +168,7 @@ export class CharactersComponent implements OnInit, OnDestroy {
         const bDate = new Date(b.birthdate ?? '').getTime() || 0;
         return (aDate - bDate) * dir;
       }
-      const aVal = String(a[key] ?? '');
-      const bVal = String(b[key] ?? '');
-      return aVal.localeCompare(bVal) * dir;
+      return String(a[key] ?? '').localeCompare(String(b[key] ?? '')) * dir;
     });
   }
 
@@ -297,10 +282,7 @@ export class CharactersComponent implements OnInit, OnDestroy {
       birthdate: birthdate
         ? this.formatDateFromISO(birthdate)
         : this.selectedCharacter.birthdate,
-      children: children
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean),
+      children: children.split(',').map((s) => s.trim()).filter(Boolean),
       spells,
     });
     this.selectedCharacter = this.getCharacterData(this.selectedCharacter);
