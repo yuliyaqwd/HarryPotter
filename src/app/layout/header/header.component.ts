@@ -2,21 +2,20 @@ import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { TuiRadio } from '@taiga-ui/kit/components/radio';
-import { TranslatePipe } from '../../pipes/translate.pipe';
-import { TranslationService } from '../../services/translation.service';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, FormsModule, TuiRadio, TranslatePipe],
+  imports: [RouterLink, RouterLinkActive, FormsModule, TuiRadio, TranslocoPipe],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })
 export class HeaderComponent {
-  private translation = inject(TranslationService);
-  currentLang = this.translation.currentLang;
+  private transloco = inject(TranslocoService);
+  currentLang = this.transloco.getActiveLang();
 
   onLangChange(lang: string) {
-    this.translation.use(lang);
+    this.transloco.setActiveLang(lang);
   }
 }

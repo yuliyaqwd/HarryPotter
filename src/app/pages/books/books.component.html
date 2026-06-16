@@ -4,17 +4,17 @@
     type="text"
     [(ngModel)]="search"
     (input)="onSearch()"
-    [placeholder]="'books.searchPlaceholder' | translate"
+    [placeholder]="'books.searchPlaceholder' | transloco"
   />
 </div>
 
 <table tuiTable [columns]="columns" tuiSortBy (tuiSortChange)="onSortChange($event)">
   <thead>
     <tr tuiThGroup>
-      <th *tuiHead="'title'" tuiTh [tuiSortable]="true">{{ 'books.col.title' | translate }}</th>
-      <th *tuiHead="'releaseDate'" tuiTh [tuiSortable]="true">{{ 'books.col.releaseDate' | translate }}</th>
-      <th *tuiHead="'pages'" tuiTh [tuiSortable]="true">{{ 'books.col.pages' | translate }}</th>
-      <th *tuiHead="'description'" tuiTh [tuiSortable]="true">{{ 'books.col.description' | translate }}</th>
+      <th *tuiHead="'title'" tuiTh [tuiSortable]="true">{{ 'books.col.title' | transloco }}</th>
+      <th *tuiHead="'releaseDate'" tuiTh [tuiSortable]="true">{{ 'books.col.releaseDate' | transloco }}</th>
+      <th *tuiHead="'pages'" tuiTh [tuiSortable]="true">{{ 'books.col.pages' | transloco }}</th>
+      <th *tuiHead="'description'" tuiTh [tuiSortable]="true">{{ 'books.col.description' | transloco }}</th>
     </tr>
   </thead>
   <tbody tuiTbody [data]="displayedBooks">

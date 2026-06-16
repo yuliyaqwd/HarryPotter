@@ -4,17 +4,17 @@
     type="text"
     [(ngModel)]="search"
     (input)="onSearch()"
-    [placeholder]="'characters.searchPlaceholder' | translate"
+    [placeholder]="'characters.searchPlaceholder' | transloco"
   />
 </div>
 
 <table tuiTable [columns]="columns" tuiSortBy (tuiSortChange)="onSortChange($event)">
   <thead>
     <tr tuiThGroup>
-      <th *tuiHead="'fullName'" tuiTh [tuiSortable]="true">{{ 'characters.col.fullName' | translate }}</th>
-      <th *tuiHead="'birthdate'" tuiTh [tuiSortable]="true">{{ 'characters.col.birthdate' | translate }}</th>
-      <th *tuiHead="'hogwartsHouse'" tuiTh [tuiSortable]="true">{{ 'characters.col.house' | translate }}</th>
-      <th *tuiHead="'interpretedBy'" tuiTh [tuiSortable]="true">{{ 'characters.col.actor' | translate }}</th>
+      <th *tuiHead="'fullName'" tuiTh [tuiSortable]="true">{{ 'characters.col.fullName' | transloco }}</th>
+      <th *tuiHead="'birthdate'" tuiTh [tuiSortable]="true">{{ 'characters.col.birthdate' | transloco }}</th>
+      <th *tuiHead="'hogwartsHouse'" tuiTh [tuiSortable]="true">{{ 'characters.col.house' | transloco }}</th>
+      <th *tuiHead="'interpretedBy'" tuiTh [tuiSortable]="true">{{ 'characters.col.actor' | transloco }}</th>
     </tr>
   </thead>
   <tbody tuiTbody [data]="characters">
@@ -36,9 +36,9 @@
                 <span class="house-hint__emoji">{{ house.emoji }}</span>
                 <div>
                   <div class="house-hint__name" [style.color]="getNameColor(house.colors)">{{ house.house }}</div>
-                  <div class="house-hint__founder">{{ 'houses.founder' | translate }}: {{ house.founder }}</div>
+                  <div class="house-hint__founder">{{ 'houses.founder' | transloco }}: {{ house.founder }}</div>
                   <div class="house-hint__colors">
-                    {{ 'houses.colors' | translate }}:
+                    {{ 'houses.colors' | transloco }}:
                     @for (color of house.colors; track color) {
                       <span [style.background]="color" class="house-hint__dot"></span>
                     }
@@ -88,17 +88,17 @@
     <div class="char-dialog__body" [formGroup]="editForm">
 
       <div class="char-dialog__row">
-        <span class="char-dialog__label">{{ 'characters.dialog.nickname' | translate }}</span>
+        <span class="char-dialog__label">{{ 'characters.dialog.nickname' | transloco }}</span>
         <strong>{{ selectedCharacter?.nickname || '—' }}</strong>
       </div>
 
       <div class="char-dialog__row">
-        <span class="char-dialog__label">{{ 'characters.dialog.house' | translate }}</span>
+        <span class="char-dialog__label">{{ 'characters.dialog.house' | transloco }}</span>
         <strong>{{ selectedCharacter?.hogwartsHouse || '—' }}</strong>
       </div>
 
       <div class="char-dialog__row">
-        <span class="char-dialog__label">{{ 'characters.dialog.interpretedBy' | translate }}</span>
+        <span class="char-dialog__label">{{ 'characters.dialog.interpretedBy' | transloco }}</span>
         @if (dialogMode === 'view') {
           <strong>{{ selectedCharacter?.interpretedBy || '—' }}</strong>
         }
@@ -112,7 +112,7 @@
       </div>
 
       <div class="char-dialog__row char-dialog__row--col" [class.char-dialog__row--error]="birthdateErrors">
-        <span class="char-dialog__label">{{ 'characters.dialog.birthdate' | translate }}</span>
+        <span class="char-dialog__label">{{ 'characters.dialog.birthdate' | transloco }}</span>
         @if (dialogMode === 'view') {
           <strong>{{ selectedCharacter?.birthdate || '—' }}</strong>
         }
@@ -132,7 +132,7 @@
       </div>
 
       <div class="char-dialog__row">
-        <span class="char-dialog__label">{{ 'characters.dialog.children' | translate }}</span>
+        <span class="char-dialog__label">{{ 'characters.dialog.children' | transloco }}</span>
         @if (dialogMode === 'view') {
           <span class="char-dialog__children">
             @if (selectedCharacter?.children?.length) {
@@ -154,7 +154,7 @@
       </div>
 
       <div class="char-dialog__row char-dialog__row--spells">
-        <span class="char-dialog__label">{{ 'characters.dialog.spells' | translate }}</span>
+        <span class="char-dialog__label">{{ 'characters.dialog.spells' | transloco }}</span>
         @if (dialogMode === 'view') {
           <strong>{{ (selectedCharacter?.spells || []).join(', ') || '—' }}</strong>
         }
@@ -162,7 +162,7 @@
           <div class="spell-select" [class.spell-select--open]="spellsDropdownOpen">
             <button type="button" class="spell-select__trigger" (click)="spellsDropdownOpen = !spellsDropdownOpen">
               <span class="spell-select__value">
-                {{ selectedSpells.length ? selectedSpells.join(', ') : ('characters.dialog.selectSpells' | translate) }}
+                {{ selectedSpells.length ? selectedSpells.join(', ') : ('characters.dialog.selectSpells' | transloco) }}
               </span>
               <tui-icon [icon]="spellsDropdownOpen ? '@tui.chevron-up' : '@tui.chevron-down'" class="spell-select__chevron" />
             </button>

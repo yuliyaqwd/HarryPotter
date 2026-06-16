@@ -1,35 +1,48 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { TranslationService } from './translation.service';
+import { TranslocoService } from '@jsverse/transloco';
 import { Book, Character, House, Spell } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class HarryPotterService {
   private http = inject(HttpClient);
-  private translation = inject(TranslationService);
+  private transloco = inject(TranslocoService);
 
   private get baseUrl(): string {
-    return `https://potterapi-fedeperin.vercel.app/${this.translation.currentLang}`;
+    return `https://potterapi-fedeperin.vercel.app/${this.transloco.getActiveLang()}`;
   }
 
-  getBooks(page = 1, max = 10) {
-    return this.http.get<Book[]>(`${this.baseUrl}/books?max=${max}&page=${page}`);
+  private searchParam(search: string): string {
+    const trimmed = search.trim();
+    return trimmed ? `&search=${encodeURIComponent(trimmed)}` : '';
   }
 
-  getAllBooks() {
-    return this.http.get<Book[]>(`${this.baseUrl}/books?max=1000&page=1`);
+  getBooks(page = 1, max = 10, search = '') {
+    return this.http.get<Book[]>(
+      `${this.baseUrl}/books?max=${max}&page=${page}${this.searchParam(search)}`,
+    );
+  }
+
+  getAllBooks(search = '') {
+    return this.http.get<Book[]>(
+      `${this.baseUrl}/books?max=1000&page=1${this.searchParam(search)}`,
+    );
   }
 
   getHouses() {
     return this.http.get<House[]>(`${this.baseUrl}/houses`);
   }
 
-  getCharacters(page = 1, max = 10) {
-    return this.http.get<Character[]>(`${this.baseUrl}/characters?max=${max}&page=${page}`);
+  getCharacters(page = 1, max = 10, search = '') {
+    return this.http.get<Character[]>(
+      `${this.baseUrl}/characters?max=${max}&page=${page}${this.searchParam(search)}`,
+    );
   }
 
-  getAllCharacters() {
-    return this.http.get<Character[]>(`${this.baseUrl}/characters?max=1000&page=1`);
+  getAllCharacters(search = '') {
+    return this.http.get<Character[]>(
+      `${this.baseUrl}/characters?max=1000&page=1${this.searchParam(search)}`,
+    );
   }
 
   getSpells() {

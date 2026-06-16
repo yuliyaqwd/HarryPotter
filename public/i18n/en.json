@@ -1,0 +1,27 @@
+{
+  "nav": { "books": "Books", "houses": "Houses", "characters": "Characters" },
+  "books": {
+    "searchPlaceholder": "Search by title…",
+    "col": { "title": "Title", "releaseDate": "Release date", "pages": "Pages", "description": "Description" }
+  },
+  "characters": {
+    "searchPlaceholder": "Search by name…",
+    "col": { "fullName": "Full name", "birthdate": "Birthdate", "house": "House", "actor": "Actor" },
+    "dialog": {
+      "nickname": "Nickname",
+      "house": "House",
+      "interpretedBy": "Interpreted by",
+      "birthdate": "Birth date",
+      "children": "Children",
+      "spells": "Spells",
+      "selectSpells": "Select spells…"
+    },
+    "validation": {
+      "required": "Birth date is required",
+      "invalid": "Invalid date",
+      "future": "Date cannot be in the future",
+      "minYear": "Year cannot be before 1800"
+    }
+  },
+  "houses": { "founder": "Founder", "colors": "colors" }
+}

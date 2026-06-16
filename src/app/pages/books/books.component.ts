@@ -5,9 +5,8 @@ import {
   TuiTablePagination,
   TuiTablePaginationEvent,
 } from '@taiga-ui/addon-table/components/table-pagination';
-import { TranslatePipe } from '../../pipes/translate.pipe';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { HarryPotterService } from '../../services/harry-potter.service';
-import { TranslationService } from '../../services/translation.service';
 import { Subscription } from 'rxjs';
 import { skip } from 'rxjs/operators';
 import { Book } from '../../models';
@@ -15,17 +14,16 @@ import { Book } from '../../models';
 @Component({
   selector: 'app-books',
   standalone: true,
-  imports: [FormsModule, TuiTable, TuiTablePagination, TranslatePipe],
+  imports: [FormsModule, TuiTable, TuiTablePagination, TranslocoPipe],
   templateUrl: './books.component.html',
   styleUrl: './books.component.scss',
 })
 export class BooksComponent implements OnInit, OnDestroy {
   private harryPotterService = inject(HarryPotterService);
-  private translation = inject(TranslationService);
+  private transloco = inject(TranslocoService);
   private langSub!: Subscription;
 
   columns = ['title', 'releaseDate', 'pages', 'description'];
-  allBooks: Book[] = [];
   displayedBooks: Book[] = [];
   page = 0;
   pageSize = 5;
@@ -35,7 +33,7 @@ export class BooksComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadAll();
-    this.langSub = this.translation.currentLang$.pipe(skip(1)).subscribe(() => {
+    this.langSub = this.transloco.langChanges$.pipe(skip(1)).subscribe(() => {
       this.page = 0;
       this.search = '';
       this.loadAll();
@@ -47,29 +45,22 @@ export class BooksComponent implements OnInit, OnDestroy {
   }
 
   private loadAll() {
-    this.harryPotterService.getAllBooks().subscribe((data) => {
-      this.allBooks = data;
+    this.loadTotal();
+    this.loadPage();
+  }
+
+  private loadTotal() {
+    this.harryPotterService.getAllBooks(this.search).subscribe((data) => {
       this.totalItems = data.length;
-      this.loadPage();
     });
   }
 
   loadPage() {
-    if (this.search.trim()) {
-      const filtered = this.allBooks.filter((b) =>
-        b.title.toLowerCase().includes(this.search.toLowerCase()),
-      );
-      this.totalItems = filtered.length;
-      const start = this.page * this.pageSize;
-      this.displayedBooks = filtered.slice(start, start + this.pageSize);
-    } else {
-      this.totalItems = this.allBooks.length;
-      this.harryPotterService
-        .getBooks(this.page + 1, this.pageSize)
-        .subscribe((data) => {
-          this.displayedBooks = data;
-        });
-    }
+    this.harryPotterService
+      .getBooks(this.page + 1, this.pageSize, this.search)
+      .subscribe((data) => {
+        this.displayedBooks = data;
+      });
   }
 
   onPaginationChange({ page, size }: TuiTablePaginationEvent) {
@@ -80,6 +71,7 @@ export class BooksComponent implements OnInit, OnDestroy {
 
   onSearch() {
     this.page = 0;
+    this.loadTotal();
     this.loadPage();
   }
 

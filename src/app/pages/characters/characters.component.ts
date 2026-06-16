@@ -20,8 +20,7 @@ import { TuiHint } from '@taiga-ui/core/directives/hint';
 import { TuiDialog } from '@taiga-ui/core/components/dialog';
 import { TuiButton } from '@taiga-ui/core/components/button';
 import { TuiIcon } from '@taiga-ui/core/components/icon';
-import { TranslatePipe } from '../../pipes/translate.pipe';
-import { TranslationService } from '../../services/translation.service';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { HarryPotterService } from '../../services/harry-potter.service';
 import { Character, House, Spell } from '../../models';
 import { DateTime } from 'luxon';
@@ -48,19 +47,18 @@ function minYear1800Validator(control: AbstractControl): ValidationErrors | null
     TuiDialog,
     TuiButton,
     TuiIcon,
-    TranslatePipe,
+    TranslocoPipe,
   ],
   templateUrl: './characters.component.html',
   styleUrl: './characters.component.scss',
 })
 export class CharactersComponent implements OnInit, OnDestroy {
   private harryPotterService = inject(HarryPotterService);
-  private translate = inject(TranslationService);
+  private transloco = inject(TranslocoService);
   private fb = inject(FormBuilder);
   private document = inject(DOCUMENT);
   private langSub!: Subscription;
 
-  allCharacters: Character[] = [];
   characters: Character[] = [];
   houses: House[] = [];
   spellList: Spell[] = [];
@@ -90,7 +88,7 @@ export class CharactersComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.loadAll();
-    this.langSub = this.translate.currentLang$.pipe(skip(1)).subscribe(() => {
+    this.langSub = this.transloco.langChanges$.pipe(skip(1)).subscribe(() => {
       this.page = 0;
       this.search = '';
       this.isDialogOpen = false;
@@ -103,11 +101,8 @@ export class CharactersComponent implements OnInit, OnDestroy {
   }
 
   private loadAll() {
-    this.harryPotterService.getAllCharacters().subscribe((data) => {
-      this.allCharacters = data;
-      this.totalItems = data.length;
-      this.loadPage();
-    });
+    this.loadTotal();
+    this.loadPage();
     this.harryPotterService.getHouses().subscribe((data) => {
       this.houses = data;
     });
@@ -116,28 +111,22 @@ export class CharactersComponent implements OnInit, OnDestroy {
     });
   }
 
+  private loadTotal() {
+    this.harryPotterService.getAllCharacters(this.search).subscribe((data) => {
+      this.totalItems = data.length;
+    });
+  }
+
   get spells(): string[] {
     return this.spellList.map((s) => s.spell);
   }
 
   loadPage() {
-    if (this.search.trim()) {
-      const filtered = this.allCharacters.filter((c) =>
-        c.fullName.toLowerCase().includes(this.search.toLowerCase()),
-      );
-      this.totalItems = filtered.length;
-      const start = this.page * this.pageSize;
-      this.characters = filtered
-        .slice(start, start + this.pageSize)
-        .map((c) => this.getCharacterData(c));
-    } else {
-      this.totalItems = this.allCharacters.length;
-      this.harryPotterService
-        .getCharacters(this.page + 1, this.pageSize)
-        .subscribe((data) => {
-          this.characters = data.map((c) => this.getCharacterData(c));
-        });
-    }
+    this.harryPotterService
+      .getCharacters(this.page + 1, this.pageSize, this.search)
+      .subscribe((data) => {
+        this.characters = data.map((c) => this.getCharacterData(c));
+      });
   }
 
   onPaginationChange({ page, size }: TuiTablePaginationEvent) {
@@ -148,6 +137,7 @@ export class CharactersComponent implements OnInit, OnDestroy {
 
   onSearch() {
     this.page = 0;
+    this.loadTotal();
     this.loadPage();
   }
 
@@ -222,9 +212,9 @@ export class CharactersComponent implements OnInit, OnDestroy {
   get birthdateErrors(): string {
     const ctrl = this.editForm.get('birthdate');
     if (!ctrl?.errors || !ctrl.touched) return '';
-    if (ctrl.errors['required']) return this.translate.instant('characters.validation.required');
-    if (ctrl.errors['futureDate']) return this.translate.instant('characters.validation.future');
-    if (ctrl.errors['minYear']) return this.translate.instant('characters.validation.minYear');
+    if (ctrl.errors['required']) return this.transloco.translate('characters.validation.required');
+    if (ctrl.errors['futureDate']) return this.transloco.translate('characters.validation.future');
+    if (ctrl.errors['minYear']) return this.transloco.translate('characters.validation.minYear');
     return '';
   }
 

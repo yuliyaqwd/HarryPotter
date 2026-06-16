@@ -8,9 +8,9 @@
         <span class="house-card__emoji">{{ house.emoji }}</span>
         <div>
           <div class="house-card__name" [style.color]="getNameColor(house.colors)">{{ house.house }}</div>
-          <div class="house-card__founder">{{ 'houses.founder' | translate }}: {{ house.founder }}</div>
+          <div class="house-card__founder">{{ 'houses.founder' | transloco }}: {{ house.founder }}</div>
           <div class="house-card__colors">
-            {{ 'houses.colors' | translate }}
+            {{ 'houses.colors' | transloco }}
             @for (color of house.colors; track color) {
               <span class="color-dot" [style.background]="color"></span>
             }

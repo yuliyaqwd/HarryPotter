@@ -1,8 +1,7 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { TuiCardLarge } from '@taiga-ui/layout/components/card';
-import { TranslatePipe } from '../../pipes/translate.pipe';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { HarryPotterService } from '../../services/harry-potter.service';
-import { TranslationService } from '../../services/translation.service';
 import { Subscription } from 'rxjs';
 import { skip } from 'rxjs/operators';
 import { House } from '../../models';
@@ -10,20 +9,20 @@ import { House } from '../../models';
 @Component({
   selector: 'app-houses',
   standalone: true,
-  imports: [TuiCardLarge, TranslatePipe],
+  imports: [TuiCardLarge, TranslocoPipe],
   templateUrl: './houses.component.html',
   styleUrl: './houses.component.scss',
 })
 export class HousesComponent implements OnInit, OnDestroy {
   private harryPotterService = inject(HarryPotterService);
-  private translation = inject(TranslationService);
+  private transloco = inject(TranslocoService);
   private langSub!: Subscription;
 
   houses: House[] = [];
 
   ngOnInit() {
     this.loadAll();
-    this.langSub = this.translation.currentLang$.pipe(skip(1)).subscribe(() => {
+    this.langSub = this.transloco.langChanges$.pipe(skip(1)).subscribe(() => {
       this.loadAll();
     });
   }
