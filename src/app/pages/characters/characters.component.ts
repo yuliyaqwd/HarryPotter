@@ -20,6 +20,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
 import { HarryPotterService } from '../../services/harry-potter.service';
 import { Character, House, Spell } from '../../models';
+import { DateTime } from 'luxon';
 
 function notFutureDateValidator(control: AbstractControl): ValidationErrors | null {
   if (!control.value) return null;
@@ -79,7 +80,8 @@ export class CharactersComponent implements OnInit, OnDestroy {
     spells: [[] as string[]],
   });
 
-  private localEdits = new Map<number, Partial<Character>>();
+  private readonly EDITS_STORAGE_KEY = 'hp-character-edits';
+  private localEdits = this.loadEditsFromStorage();
 
   ngOnInit() {
     this.loadAll();
@@ -87,7 +89,6 @@ export class CharactersComponent implements OnInit, OnDestroy {
       this.page = 0;
       this.search = '';
       this.isDialogOpen = false;
-      this.localEdits.clear();
       this.loadAll();
     });
   }
@@ -164,9 +165,9 @@ export class CharactersComponent implements OnInit, OnDestroy {
     const dir = event.sortDirection;
     this.characters = [...this.characters].sort((a, b) => {
       if (key === 'birthdate') {
-        const aDate = new Date(a.birthdate ?? '').getTime() || 0;
-        const bDate = new Date(b.birthdate ?? '').getTime() || 0;
-        return (aDate - bDate) * dir;
+        const aMs = DateTime.fromFormat(a.birthdate ?? '', 'MMM d, yyyy').toMillis() || 0;
+        const bMs = DateTime.fromFormat(b.birthdate ?? '', 'MMM d, yyyy').toMillis() || 0;
+        return (aMs - bMs) * dir;
       }
       return String(a[key] ?? '').localeCompare(String(b[key] ?? '')) * dir;
     });
@@ -190,6 +191,24 @@ export class CharactersComponent implements OnInit, OnDestroy {
     return edits ? { ...character, ...edits } : character;
   }
 
+  private loadEditsFromStorage(): Map<number, Partial<Character>> {
+    try {
+      const raw = localStorage.getItem(this.EDITS_STORAGE_KEY);
+      if (!raw) return new Map();
+      const entries: [number, Partial<Character>][] = JSON.parse(raw);
+      return new Map(entries);
+    } catch {
+      return new Map();
+    }
+  }
+
+  private saveEditsToStorage() {
+    localStorage.setItem(
+      this.EDITS_STORAGE_KEY,
+      JSON.stringify([...this.localEdits.entries()]),
+    );
+  }
+
   private setHouseColor(character: Character) {
     const house = this.getHouse(character.hogwartsHouse);
     const color = house ? this.getNameColor(house.colors) : 'transparent';
@@ -197,20 +216,13 @@ export class CharactersComponent implements OnInit, OnDestroy {
   }
 
   private parseDateToISO(dateStr: string): string {
-    if (!dateStr) return '';
-    const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return '';
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    const dt = DateTime.fromFormat(dateStr, 'MMM d, yyyy', { locale: 'en-US' });
+    return dt.isValid ? (dt.toISODate() ?? '') : '';
   }
 
   private formatDateFromISO(iso: string): string {
-    if (!iso) return '';
-    const [year, month, day] = iso.split('-').map(Number);
-    const d = new Date(year, month - 1, day);
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const dt = DateTime.fromISO(iso);
+    return dt.isValid ? dt.toFormat('MMM d, yyyy') : '';
   }
 
   // ─── Reactive form getters ──────────────────────────────────
@@ -285,6 +297,7 @@ export class CharactersComponent implements OnInit, OnDestroy {
       children: children.split(',').map((s) => s.trim()).filter(Boolean),
       spells,
     });
+    this.saveEditsToStorage();
     this.selectedCharacter = this.getCharacterData(this.selectedCharacter);
     this.loadPage();
     this.dialogMode = 'view';
