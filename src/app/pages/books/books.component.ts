@@ -1,6 +1,10 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TuiTable } from '@taiga-ui/addon-table/components/table';
+import {
+  TuiTablePagination,
+  TuiTablePaginationEvent,
+} from '@taiga-ui/addon-table/components/table-pagination';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { HarryPotterService } from '../../services/harry-potter.service';
 import { TranslationService } from '../../services/translation.service';
@@ -11,7 +15,7 @@ import { Book } from '../../models';
 @Component({
   selector: 'app-books',
   standalone: true,
-  imports: [FormsModule, TuiTable, TranslatePipe],
+  imports: [FormsModule, TuiTable, TuiTablePagination, TranslatePipe],
   templateUrl: './books.component.html',
   styleUrl: './books.component.scss',
 })
@@ -28,10 +32,6 @@ export class BooksComponent implements OnInit, OnDestroy {
   pageSizes = [5, 10, 20];
   totalItems = 0;
   search = '';
-
-  get totalPages(): number {
-    return Math.max(1, Math.ceil(this.totalItems / this.pageSize));
-  }
 
   ngOnInit() {
     this.loadAll();
@@ -72,24 +72,15 @@ export class BooksComponent implements OnInit, OnDestroy {
     }
   }
 
-  onPageChange(page: number) {
+  onPaginationChange({ page, size }: TuiTablePaginationEvent) {
     this.page = page;
-    this.loadPage();
-  }
-
-  onPageSizeChange(size: number) {
-    this.pageSize = Number(size);
-    this.page = 0;
+    this.pageSize = size;
     this.loadPage();
   }
 
   onSearch() {
     this.page = 0;
     this.loadPage();
-  }
-
-  min(a: number, b: number): number {
-    return Math.min(a, b);
   }
 
   onSortChange(event: { sortKey: string | null; sortDirection: 1 | -1 }) {

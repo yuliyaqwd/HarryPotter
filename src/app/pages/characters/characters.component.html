@@ -55,26 +55,13 @@
   </tbody>
 </table>
 
-<div class="tbl-footer">
-  <span class="tbl-footer__pages">{{ 'pagination.pages' | translate }} <strong>{{ totalPages }}</strong></span>
-
-  <div class="tbl-footer__center">
-    <span>{{ 'pagination.rowsPerPage' | translate }}</span>
-    <select class="tbl-footer__size" [ngModel]="pageSize" (ngModelChange)="onPageSizeChange($event)">
-      @for (s of pageSizes; track s) {
-        <option [value]="s">{{ s }}</option>
-      }
-    </select>
-    <strong>{{ page * pageSize + 1 }}–{{ min((page + 1) * pageSize, totalItems) }}</strong>
-    <span>{{ 'pagination.of' | translate }}</span>
-    <strong>{{ totalItems }}</strong>
-  </div>
-
-  <div class="tbl-footer__nav">
-    <button class="tbl-footer__btn" [disabled]="page === 0" (click)="onPageChange(page - 1)">&#8249;</button>
-    <button class="tbl-footer__btn" [disabled]="page >= totalPages - 1" (click)="onPageChange(page + 1)">&#8250;</button>
-  </div>
-</div>
+<tui-table-pagination
+  [items]="pageSizes"
+  [total]="totalItems"
+  [page]="page"
+  [size]="pageSize"
+  (paginationChange)="onPaginationChange($event)"
+/>
 
 <!-- Character dialog (view + inline edit) -->
 <ng-template [(tuiDialog)]="isDialogOpen" [tuiDialogOptions]="dialogOptions">
