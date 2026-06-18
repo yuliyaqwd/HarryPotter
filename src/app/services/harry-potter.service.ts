@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { TranslocoService } from '@jsverse/transloco';
 import { Book, Character, House, Spell } from '../models';
 
@@ -12,40 +13,40 @@ export class HarryPotterService {
     return `https://potterapi-fedeperin.vercel.app/${this.transloco.getActiveLang()}`;
   }
 
-  private searchParam(search: string): string {
+  private buildParams(page: number, max: number, search: string): HttpParams {
+    let params = new HttpParams().appendAll({ page, max });
     const trimmed = search.trim();
-    return trimmed ? `&search=${encodeURIComponent(trimmed)}` : '';
+    if (trimmed) {
+      params = params.append('search', trimmed);
+    }
+    return params;
   }
 
-  getBooks(page = 1, max = 10, search = '') {
-    return this.http.get<Book[]>(
-      `${this.baseUrl}/books?max=${max}&page=${page}${this.searchParam(search)}`,
-    );
+  getBooks(page = 1, max = 10, search = ''): Observable<Book[]> {
+    const params = this.buildParams(page, max, search);
+    return this.http.get<Book[]>(`${this.baseUrl}/books`, { params });
   }
 
-  getAllBooks(search = '') {
-    return this.http.get<Book[]>(
-      `${this.baseUrl}/books?max=1000&page=1${this.searchParam(search)}`,
-    );
+  getAllBooks(search = ''): Observable<Book[]> {
+    const params = this.buildParams(1, 1000, search);
+    return this.http.get<Book[]>(`${this.baseUrl}/books`, { params });
   }
 
-  getHouses() {
+  getHouses(): Observable<House[]> {
     return this.http.get<House[]>(`${this.baseUrl}/houses`);
   }
 
-  getCharacters(page = 1, max = 10, search = '') {
-    return this.http.get<Character[]>(
-      `${this.baseUrl}/characters?max=${max}&page=${page}${this.searchParam(search)}`,
-    );
+  getCharacters(page = 1, max = 10, search = ''): Observable<Character[]> {
+    const params = this.buildParams(page, max, search);
+    return this.http.get<Character[]>(`${this.baseUrl}/characters`, { params });
   }
 
-  getAllCharacters(search = '') {
-    return this.http.get<Character[]>(
-      `${this.baseUrl}/characters?max=1000&page=1${this.searchParam(search)}`,
-    );
+  getAllCharacters(search = ''): Observable<Character[]> {
+    const params = this.buildParams(1, 1000, search);
+    return this.http.get<Character[]>(`${this.baseUrl}/characters`, { params });
   }
 
-  getSpells() {
+  getSpells(): Observable<Spell[]> {
     return this.http.get<Spell[]>(`${this.baseUrl}/spells`);
   }
 }

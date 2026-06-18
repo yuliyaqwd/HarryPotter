@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { TuiRadio } from '@taiga-ui/kit/components/radio';
+import { TuiRadio } from '@taiga-ui/core/components/radio';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({

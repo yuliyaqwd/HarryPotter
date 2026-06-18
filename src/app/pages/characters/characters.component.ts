@@ -16,8 +16,8 @@ import {
   TuiTablePagination,
   TuiTablePaginationEvent,
 } from '@taiga-ui/addon-table/components/table-pagination';
-import { TuiHint } from '@taiga-ui/core/directives/hint';
-import { TuiDialog } from '@taiga-ui/core/components/dialog';
+import { TuiHint } from '@taiga-ui/core/portals/hint';
+import { TuiDialog } from '@taiga-ui/core/portals/dialog';
 import { TuiButton } from '@taiga-ui/core/components/button';
 import { TuiIcon } from '@taiga-ui/core/components/icon';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
